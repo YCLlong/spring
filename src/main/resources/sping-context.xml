@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--可以通过import标签引入其他位置的配置文件-->
+    <import resource="spring-service.xml"></import>
+
+    <bean id="helloIOC" class="cn.ycl.study.ioc.HelloIOC">
+        <constructor-arg name="desc" ref="123"></constructor-arg>
+    </bean>
+
+</beans>
