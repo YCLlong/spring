@@ -6,8 +6,17 @@
     <!--可以通过import标签引入其他位置的配置文件-->
     <import resource="spring-service.xml"></import>
 
-    <bean id="helloIOC" class="cn.ycl.study.ioc.HelloIOC">
-        <constructor-arg name="desc" ref="123"></constructor-arg>
+    <alias name="h1" alias="h2"></alias>
+    <alias name="h1" alias="h3"></alias>
+    <bean id="helloIOC" name="h1,h11"  class="cn.ycl.study.ioc.HelloIOC">
+        <constructor-arg name="desc" value="123"></constructor-arg>
     </bean>
 
+    <bean id="config1" name="config1" class="cn.ycl.study.ioc.bean.Config"></bean>
+
+    <bean id="config2" name="config2" class="cn.ycl.study.ioc.ConfigFactory" factory-method="createConfig"></bean>
+
+    <bean id="factory" class="cn.ycl.study.ioc.ConfigFactory"></bean>
+
+    <bean id="config3" name="config3" factory-bean="factory" factory-method="createConfigInstance"></bean>
 </beans>

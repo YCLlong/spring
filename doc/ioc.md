@@ -75,3 +75,71 @@ bean是IOC容器管理的对象，在IOC容器中 Bean定义表示为 **org.spri
 > 建议不要使用这个方式注册bean。
 我们应该需要尽早注册Bean元数据和手动提供的单例实例，以便容器在自动装配和其他内省步骤期间正确推理它们。虽然在某种程度上支持覆盖现有元数据和现有单例实例，但是在运行时注册新bean（与对工厂的实时访问同时）并未得到官方支持，并且可能导致并发访问异常，bean容器中的状态不一致
     
+### Bean的命名
+小写字母开头，驼峰式命名
+#### bean别名
+可以为一个bean定义多个name,和多个别名
+在bean标签中，多个name可以使用逗号隔开，同时可以使用alias标签为name指定别名。
+在通过ioc容器实例化Bean时，通过context.getName()方法获取到对象。
+    
+    <alias name="h1" alias="h2"></alias>
+    <alias name="h1" alias="h3"></alias>
+    <bean id="helloIOC" name="h1,h11"  class="cn.ycl.study.ioc.HelloIOC">
+        <constructor-arg name="desc" value="123"></constructor-arg>
+    </bean>
+
+    public void beanName(){
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:sping-context.xml");
+        HelloIOC t1 = (HelloIOC) context.getBean("h1");
+        HelloIOC t2 = (HelloIOC) context.getBean("h11");
+        HelloIOC t3 = (HelloIOC) context.getBean("h2");
+        HelloIOC t4 = (HelloIOC) context.getBean("h3");
+        System.out.println(t1==t2);//true
+        System.out.println(t1==t2);//true
+        System.out.println(t1==t3);//true
+        System.out.println(t1==t4);//true
+    }
+
+### Bean的实例化
+配置元数据定义了一个Bean被实例化成一个或者多个对象的规则。如果配置元的形式是XML配置文件，那么Bean定义在<beans>标签下的<bean>标签中。
+创建对象的方式有**构造函数创建**、**静态工厂方法创建**、**实例工厂方法创建**
+
+#### 构造函数创建
+要求class中必须有一个无参构造函数，否则无法创建。类中默认有一个隐式的无参构造函数，如果我们定义了有参构造函数，那么这个无参构造函数就会被覆盖掉，需要显示的声明一个构造函数。
+配置危机定义：
+
+    <bean id="config" name="config" class="cn.ycl.study.ioc.bean.Config"></bean>
+
+#### 静态工厂方法创建
+bean标签中的 factory-method 属性可以指定创建对象的**静态**方法。
+
+    <bean id="config2" name="config2" class="cn.ycl.study.ioc.ConfigFactory" factory-method="createConfig"></bean>
+    
+#### 实例工厂方法创建
+        <bean id="factory" class="cn.ycl.study.ioc.ConfigFactory"></bean>
+    
+        <bean id="config3" name="config3" factory-bean="factory" factory-method="createConfigInstance"></bean>
+        
+工厂的java类
+public class ConfigFactory {
+
+    public static Config createConfig(){
+        Config config = new Config();
+        config.setName("静态工厂方法创建");
+        return config;
+    }
+
+    /**
+     * 修饰符 public或者privite都能正常的返回对象
+     * @return
+     */
+    public Config createConfigInstance(){
+        Config config = new Config();
+        config.setName("实例工厂方法创建");
+        return config;
+    }
+}
+   
+   
+ 
+
