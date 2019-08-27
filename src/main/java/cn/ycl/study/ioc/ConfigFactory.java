@@ -6,7 +6,7 @@ public class ConfigFactory {
 
     public static Config createConfig(){
         Config config = new Config();
-        config.setName("静态工厂方法创建");
+       // config.setName("静态工厂方法创建");
         return config;
     }
 
@@ -16,7 +16,7 @@ public class ConfigFactory {
      */
     public Config createConfigInstance(){
         Config config = new Config();
-        config.setName("实例工厂方法创建");
+     //   config.setName("实例工厂方法创建");
         return config;
     }
 }

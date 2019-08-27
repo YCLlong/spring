@@ -146,16 +146,192 @@ bean标签中的 factory-method 属性可以指定创建对象的**静态**方�
    
  ### 依赖注入Dependency Injection(DI)
 一个应用程序往往通过多个对象组成，对象之间相互协作，完成定制的功能。IOC容器创建对象的同时也会根据配置元数据信息给创建的对象进行赋值。赋值的过程就叫做注入。对象和对象之间的依赖关系往往是对象之间的相互引用。比如对象B是对象A的成员属性，那么对象A就要依赖于对象B.
->每个对象往往都需要获取与其合作的对象（也就是它所依赖的对象）的引用。如果这个获取过程要靠自身实现，那么这将导致代码高度耦合并且难以维护和调试。
+
+每个对象往往都需要获取与其合作的对象（也就是它所依赖的对象）的引用。如果这个获取过程要靠自身实现，那么这将导致代码高度耦合并且难以维护和调试。
+
 IoC模式，系统中通过引入实现了IoC模式的IoC容器，即可由IoC容器来管理对象的生命周期、依赖关系等，从而使得应用程序的配置和依赖性规范与实际的应用程序代码分离。其中一个特点就是通过文本的配置文件进行应用程序组件间相互关系的配置，而不用重新修改并编译具体的代码。
-从而解耦
+从而解耦.
+
+DI主要的方式：基于构造函数的依赖注入和基于Setter的依赖注入。
 
 #### 构造函数注入
+有些时候对象的属性并不是都提供了set方法，比如第三方的一些类库，我们只能通过构造参数注入。
 
-
-
+    <!--构造函数属性注入->
+    <bean id="config4" name="config4" class="cn.ycl.study.ioc.bean.Config">
+        <constructor-arg name="name" type="java.lang.String" value="构造函数注入"></constructor-arg>
+        <constructor-arg index="1" ref="h1"></constructor-arg>
+        <constructor-arg name="version" value="2"></constructor-arg>
+    </bean>
+    
+> 通过bean标签内的constructor-arg 标签指定。注意其中index从0开始-
 
 #### setter方法注入
-   
- 
 
+    <!--setter注入。->
+       <bean id="config5" name="config5" class="cn.ycl.study.ioc.bean.Config">
+           <property name="name" value="setter注入"></property>
+           <property name="ioc" ref="h1"></property>
+           <property name="version" value="12"></property>
+       </bean>
+       
+ > 要求bean需要提供属性的set方法，且修饰符是public，否则的就会报错-
+ 
+构造函数注入和Set方法注入可以混合着用。
+
+#### p命名空间
+为了使配置更加的简介，<property>标签可以被p命名空间的方式简化
+>在\<beans>标签中 加入属性  xmlns:p="http://www.springframework.org/schema/p"
+
+    <!--p命名空间-->
+    <bean id="config6" name="config6" class="cn.ycl.study.ioc.bean.Config"
+          p:name="p命名空间"
+          p:ioc-ref="h2"
+          p:version="10086"
+    />
+
+#### idref
+\<idref>标签可以是  \<constructor-arg>标签或者\<property>标签的内部标签。
+
+    <bean id="config7" name="config7" class="cn.ycl.study.ioc.bean.Config">
+        <constructor-arg name="name">
+            <idref bean="helloIOC"></idref>
+        </constructor-arg>
+        <property name="version">
+            <idref bean="helloIOC"></idref>
+        </property>
+    </bean>
+   
+idref和ref的区别在于 idref注入的是Bean的id的值，相当于注入的是一个字符串而不是对象的引用。同时会检查当前ioc容器内是否存在这个bean.
+
+#### 引用ioc父容器内的bean
+什么是父容器和子容器呢？例如：
+> Spring和SpringMVC的容器具有父子关系，Spring容器为父容器，SpringMVC为子容器，子容器可以引用父容器中的Bean，而父容器不可以引用子容器中的Bean。
+
+    <!-- in the child (descendant) context -->
+    <bean id="accountService" <!-- bean name is the same as the parent bean -->
+        class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref parent="accountService"/> <!-- notice how we refer to the parent bean -->
+        </property>
+        <!-- insert other configuration and dependencies as required here -->
+    </bean>
+#### 内部bean
+内部bean不需要指定id和name
+
+    <bean id="config7" name="config7" class="cn.ycl.study.ioc.bean.Config">
+        <constructor-arg name="ioc">
+            <bean class="cn.ycl.study.ioc.HelloIOC">
+                <constructor-arg name="desc" value="内部bean"></constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+#### 复杂类型的属性注入
+    public class ValueConfig {
+        private List<String> stringList;
+        private List<Config> configList;
+        private Map<String,String> stringMap;
+        private Map<String,Config> configMap;
+        private Set<String> stringSet;
+        private Set<Config> configSet;
+        private String[] strArray;
+        private Config[] configArray;
+        private Properties prop;
+    
+        public ValueConfig(){}
+    
+        //省略属性的set方法
+    }
+    
+ 配置文件
+ 
+    <!--复杂属性的注入-->
+        <bean id="config8" name="config8" class="cn.ycl.study.ioc.bean.ValueConfig">
+            <property name="configArray">
+                <!--对象数组注入-->
+                <array>
+                    <bean class="cn.ycl.study.ioc.bean.Config">
+                        <property name="name" value="configArray1"></property>
+                        <property name="ioc">
+                            <null></null>
+                        </property>
+                    </bean>
+    
+                    <bean class="cn.ycl.study.ioc.bean.Config">
+                        <property name="name" value="configArray2"></property>
+                        <property name="ioc" ref="h3"></property>
+                    </bean>
+                </array>
+            </property>
+    
+            <property name="strArray">
+                <!--简单类型数组注入-->
+                <array>
+                    <value>123</value>
+                    <value>456</value>
+                </array>
+            </property>
+    
+            <property name="configList">
+                <!--对象List注入-->
+                <list>
+                    <bean class="cn.ycl.study.ioc.bean.Config">
+                        <property name="name" value="configList1"></property>
+                        <property name="ioc">
+                            <null></null>
+                        </property>
+                    </bean>
+                    <bean class="cn.ycl.study.ioc.bean.Config">
+                        <property name="name" value="configList2"></property>
+                    </bean>
+                </list>
+            </property>
+    
+            <property name="stringList">
+                <!--简单类型List注入-->
+                <list>
+                    <value>list1</value>
+                    <value>list2</value>
+                    <value>list3</value>
+                </list>
+            </property>
+    
+            <property name="configMap">
+                <!--map注入，如果key是引用类型，则用key-ref,值是引用类型value-ref-->
+                <map>
+                    <entry key="configMap1" value-ref="config1"></entry>
+                    <entry key="configMap2" value-ref="config2"></entry>
+                </map>
+            </property>
+    
+            <property name="stringMap">
+                <map>
+                    <entry key="configMap1" value="config1"></entry>
+                    <entry key="configMap2" value="config2"></entry>
+                </map>
+            </property>
+    
+            <property name="configSet">
+                <!--对象 set注入-->
+                <set>
+                    <ref bean="config1"></ref>
+                    <ref bean="config2"></ref>
+                </set>
+            </property>
+    
+            <property name="stringSet">
+                <set>
+                    <value>set1</value>
+                    <value>set2</value>
+                </set>
+            </property>
+    
+            <!--property类型注入，简单的keyvalue的类型-->
+            <property name="prop">
+                <props>
+                    <prop key="prop1">属性prop1对应的值</prop>
+                    <prop key="prop2">属性prop2的值</prop>
+                </props>
+            </property>
+        </bean>

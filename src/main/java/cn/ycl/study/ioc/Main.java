@@ -1,6 +1,7 @@
 package cn.ycl.study.ioc;
 
 import cn.ycl.study.ioc.bean.Config;
+import cn.ycl.study.ioc.bean.ValueConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -75,14 +76,33 @@ public class Main {
         System.out.println(config);
     }
 
+    public void constructorArgsDi(){
+        ApplicationContext context = getContrext();
+        Config config = (Config) context.getBean("config4");
+        System.out.println(config);
+    }
+    /**
+     * setter方式的依赖注入
+     */
+    public void setterDi(){
+        ApplicationContext context = getContrext();
+        Config config = (Config) context.getBean("config7");
+        System.out.println(config);
+    }
 
-
-
+    /**
+     * 复杂属性注入
+     */
+    public void complexPropertiesDi(){
+        ApplicationContext context = getContrext();
+        ValueConfig config = (ValueConfig) context.getBean("config8");
+        System.out.println(config);
+    }
 
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.createByFactoryInstance();
+        main.complexPropertiesDi();
     }
 
     public static ApplicationContext getContrext(){
