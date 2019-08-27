@@ -12,11 +12,13 @@
         <constructor-arg name="desc" value="123"></constructor-arg>
     </bean>
 
+    <!--构造函数创建对象-->
     <bean id="config1" name="config1" class="cn.ycl.study.ioc.bean.Config"></bean>
 
+    <!--静态工厂方法创建对象-->
     <bean id="config2" name="config2" class="cn.ycl.study.ioc.ConfigFactory" factory-method="createConfig"></bean>
 
+    <!--实例工厂方法创建对象-->
     <bean id="factory" class="cn.ycl.study.ioc.ConfigFactory"></bean>
-
     <bean id="config3" name="config3" factory-bean="factory" factory-method="createConfigInstance"></bean>
 </beans>

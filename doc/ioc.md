@@ -8,6 +8,9 @@
 是 xml配置文件，java注解，java配置类的形式。关于ApplicationContext接口，Spring提供了多种实现，比如ClasspathXmlApplicationContext,可以读取xml配置文件
 创建IOC容器实例。
 
+### 什么是IOC
+    IoC(Inversion of control)控制权由对象本身转向容器；由容器根据配置文件去创建实例并创建各个实例之间的依赖关系
+    
 ## 实例化容器
  >首先创建配置元数据
  
@@ -121,25 +124,38 @@ bean标签中的 factory-method 属性可以指定创建对象的**静态**方�
         <bean id="config3" name="config3" factory-bean="factory" factory-method="createConfigInstance"></bean>
         
 工厂的java类
-public class ConfigFactory {
 
-    public static Config createConfig(){
-        Config config = new Config();
-        config.setName("静态工厂方法创建");
-        return config;
+    public class ConfigFactory {
+    
+        public static Config createConfig(){
+            Config config = new Config();
+            config.setName("静态工厂方法创建");
+            return config;
+        }
+    
+        /**
+         * 修饰符 public或者privite都能正常的返回对象
+         * @return
+         */
+        public Config createConfigInstance(){
+            Config config = new Config();
+            config.setName("实例工厂方法创建");
+            return config;
+        }
     }
-
-    /**
-     * 修饰符 public或者privite都能正常的返回对象
-     * @return
-     */
-    public Config createConfigInstance(){
-        Config config = new Config();
-        config.setName("实例工厂方法创建");
-        return config;
-    }
-}
    
+ ### 依赖注入Dependency Injection(DI)
+一个应用程序往往通过多个对象组成，对象之间相互协作，完成定制的功能。IOC容器创建对象的同时也会根据配置元数据信息给创建的对象进行赋值。赋值的过程就叫做注入。对象和对象之间的依赖关系往往是对象之间的相互引用。比如对象B是对象A的成员属性，那么对象A就要依赖于对象B.
+>每个对象往往都需要获取与其合作的对象（也就是它所依赖的对象）的引用。如果这个获取过程要靠自身实现，那么这将导致代码高度耦合并且难以维护和调试。
+IoC模式，系统中通过引入实现了IoC模式的IoC容器，即可由IoC容器来管理对象的生命周期、依赖关系等，从而使得应用程序的配置和依赖性规范与实际的应用程序代码分离。其中一个特点就是通过文本的配置文件进行应用程序组件间相互关系的配置，而不用重新修改并编译具体的代码。
+从而解耦
+
+#### 构造函数注入
+
+
+
+
+#### setter方法注入
    
  
 
