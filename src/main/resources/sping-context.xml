@@ -150,5 +150,20 @@
     <bean id="vlueConfig"  class="cn.ycl.study.ioc.HelloIOC">
         <constructor-arg name="desc" value="自动装配"></constructor-arg>
     </bean>
-    <bean name="config9" autowire="constructor" class="cn.ycl.study.ioc.bean.AutowireConfig"/>
+    <bean name="config9" autowire="no" class="cn.ycl.study.ioc.bean.AutowireConfig"/>
+
+    <!--方法注入 lookup-method-->
+    <bean name="beanB" class="cn.ycl.study.ioc.methoddi.BeanB" scope="prototype"></bean>
+    <bean name="beanA" class="cn.ycl.study.ioc.methoddi.BeanA">
+        <lookup-method name="getBeanB" bean="beanB"></lookup-method>
+    </bean>
+
+    <!--方法注入 replace-method-->
+    <bean name="replaceBeanA" class="cn.ycl.study.ioc.methoddi.ReplaceBeanA"/>
+    <bean name="replaceBeanB" class="cn.ycl.study.ioc.methoddi.BeanB">
+        <property name="desc" value="replace-method测试，没有替换之前的初始值"/>
+        <!--替换BeanB中的 getDesc 方法，使用替换对象 replaceBeanA-->
+        <replaced-method  name="getDesc" replacer="replaceBeanA"/>
+    </bean>
+
 </beans>

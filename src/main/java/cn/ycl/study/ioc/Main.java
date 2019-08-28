@@ -3,6 +3,8 @@ package cn.ycl.study.ioc;
 import cn.ycl.study.ioc.bean.AutowireConfig;
 import cn.ycl.study.ioc.bean.Config;
 import cn.ycl.study.ioc.bean.ValueConfig;
+import cn.ycl.study.ioc.methoddi.BeanA;
+import cn.ycl.study.ioc.methoddi.BeanB;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -109,10 +111,28 @@ public class Main {
         System.out.println(config);
     }
 
+    /**
+     * 方法注入
+     */
+    public void methodDi(){
+        ApplicationContext context = getContrext();
+        BeanA beanA = context.getBean(BeanA.class);
+        BeanB b1 = beanA.getBeanB();
+        BeanB b2 = beanA.getBeanB();
+        System.out.println(b1 == b2);//结果是false
+    }
+
+    public void replaceDi(){
+        ApplicationContext context = getContrext();
+        BeanB beanB = (BeanB) context.getBean("replaceBeanB");
+        String desc = beanB.getDesc();
+        System.out.println(desc);
+    }
+
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.autowire();
+        main.replaceDi();
     }
 
     public static ApplicationContext getContrext(){

@@ -162,7 +162,7 @@ bean标签中的 factory-method 属性可以指定创建对象的**静态**方�
 IoC模式，系统中通过引入实现了IoC模式的IoC容器，即可由IoC容器来管理对象的生命周期、依赖关系等，从而使得应用程序的配置和依赖性规范与实际的应用程序代码分离。其中一个特点就是通过文本的配置文件进行应用程序组件间相互关系的配置，而不用重新修改并编译具体的代码。
 从而解耦.
 
-DI主要的方式：基于构造函数的依赖注入和基于Setter的依赖注入。
+DI主要的方式：基于构造函数的依赖注入和基于Setter的依赖注入以及方法注入。
 
 #### 构造函数注入
 有些时候对象的属性并不是都提供了set方法，比如第三方的一些类库，我们只能通过构造参数注入。
@@ -188,6 +188,114 @@ DI主要的方式：基于构造函数的依赖注入和基于Setter的依赖注
  > 要求bean需要提供属性的set方法，且修饰符是public，否则的就会报错-
  
 构造函数注入和Set方法注入可以混合着用。
+
+#### 方法注入
+当一个单例的BeanA,它有一个方法可以获得非单例的BeanB,但是要求每次都能获得一个新的对象。
+当我们用构造函数或者属性注入BeanB时，那么值就不能被改变了。于是Spring提供了方法注入的方式可以实现这个功能。
+##### 实现ApplicationContextAware接口：
+要达到上面说的功能，需要BeanA实现ApplicationContextAware接口中的setApplicationContext方法，以此来注入ioc实例，通过ioc实例的getBean(BeanB.class)返回不同的BeanB示例
+
+    <!--方法注入-->
+    <bean name="beanB" class="cn.ycl.study.ioc.methoddi.BeanB" scope="prototype"></bean>
+    <bean name="beanA" class="cn.ycl.study.ioc.methoddi.BeanA"></bean>
+    
+    public class BeanA implements ApplicationContextAware {
+        private ApplicationContext context;
+        private String desc;
+    
+        public BeanB getBeanB(){
+            return context.getBean(BeanB.class);
+        }
+    
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+            this.context = applicationContext;
+        }
+    }
+    
+    public class BeanB {
+        private String desc;
+    
+        public String getDesc() {
+            return desc;
+        }
+    
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+    }
+    
+     /**
+     * 方法注入
+     */
+    public void methodDi(){
+        ApplicationContext context = getContrext();
+        BeanA beanA = context.getBean(BeanA.class);
+        BeanB b1 = beanA.getBeanB();
+        BeanB b2 = beanA.getBeanB();
+        System.out.println(b1 == b2);//结果是false
+    }
+但是，我们的代码需要实现ApplicationContextWare接口，就等于和Spring代码耦合了。所以Spring为我们提供了第二种方式
+lookup-method
+
+##### lookup-method
+我们需要将返回对象的方法定义为抽象方法,在bean标签的内容中再定义lookup-method标签，指定方法名称和返回的bean、如下。
+其他代码和上面实现ApplicationContextAware接口的方式一样。
+
+    public abstract class BeanA{
+        private String desc;
+    
+        //定义为抽象方法
+        public abstract BeanB getBeanB();
+    }
+    
+    <bean name="beanA" class="cn.ycl.study.ioc.methoddi.BeanA">
+        <lookup-method name="getBeanB" bean="beanB"></lookup-method>
+    </bean>
+    
+##### replace-method
+spring提供的这种方法注入的方式比较强大。当后期扩展时，我们需要**完全替换**一个原有的bean的某个方法的实现逻辑
+就可以使用replace-method.
+    
+定义替换类，实现MethodReplacer接口
+
+    /**
+     * BeanA 的getDesc方法替换的类
+     * 需要实现接口 MethodReplacer
+     */
+    public class ReplaceBeanA implements MethodReplacer {
+        public Object reimplement(Object o, Method method, Object[] objects) throws Throwable {
+            System.out.println(o);
+            System.out.println(method.getName());
+            return "我是替换之后的值";
+        }
+    }
+    
+编写配置文件 
+    
+    <!--方法注入 replace-method-->
+    <bean name="replaceBeanA" class="cn.ycl.study.ioc.methoddi.ReplaceBeanA"/>
+    <bean name="replaceBeanB" class="cn.ycl.study.ioc.methoddi.BeanB">
+        <property name="desc" value="replace-method测试，没有替换之前的初始值"/>
+        <!--替换BeanB中的 getDesc 方法，使用替换对象 replaceBeanA-->
+        <replaced-method  name="getDesc" replacer="replaceBeanA"/>
+    </bean>
+    
+调用
+    
+    public void replaceDi(){
+        ApplicationContext context = getContrext();
+        BeanB beanB = (BeanB) context.getBean("replaceBeanB");
+        String desc = beanB.getDesc();
+        System.out.println(desc);
+    }
+    
+输出结果
+
+    cn.ycl.study.ioc.methoddi.BeanB$$EnhancerBySpringCGLIB$$b97b6895@4ae82894
+    getDesc
+    我是替换之后的值
+
+    
 
 #### p命名空间
 为了使配置更加的简介，<property>标签可以被p命名空间的方式简化
@@ -388,4 +496,17 @@ autowire 是 \<bean>标签中的属性。
 2. 在列表中查找和属性名称相同的bean，找到之后注入
 3. 如果找不到称相同的bean，但是列表中只有**一个**和属性类型相同的bean,就**装配**这个bean
 4. 如果找不到称相同的bean，但是列表中只有**多个**和属性类型相同的bean,那么**不装配**，也不报错
+
+> 显示申明的属性装配和构造函数转配的不论什么时候都会覆盖掉自动装配的值
+
+#### autowire-candidate 自动注入候选者
+autowire-candidate 是\<bean>的属性，有时候，我们不希望某个bean作为别的bean自动注入的对象，可以声明
+> \<bean id="BeanA" class = "bean.BeanA" autowire-candidate="false"/>
+
+那么BeanA就不会被别的Bean自动注入了。
+
+
+
+
+
 
