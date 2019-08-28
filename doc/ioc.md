@@ -102,7 +102,17 @@ bean是IOC容器管理的对象，在IOC容器中 Bean定义表示为 **org.spri
         System.out.println(t1==t3);//true
         System.out.println(t1==t4);//true
     }
+    
+### Bean的标识
+ioc容器查找一个Bean时常见的两种方法，**通过类类型查找**，**通过bean的标识找**
+#### 通过类类型查找  ClassType
+通过类类型查找可以准确无误的找到指定类型的bean,但是当ioc容器中同一种类型的bean不止一个的时候就会报错
 
+### 通过bean的标识找
+我们创建bean时，有id,name,还有alias。这些都可以作为bean的标识。
+在同一个bean中，id和name可以一致，但是不同bean中，id和name还有别名都必须唯一
+同时指定了id和name，那么id就是标识，name就相当于是别名
+> 通过id，name或者alias都可以找到bean
 ### Bean的实例化
 配置元数据定义了一个Bean被实例化成一个或者多个对象的规则。如果配置元的形式是XML配置文件，那么Bean定义在<beans>标签下的<bean>标签中。
 创建对象的方式有**构造函数创建**、**静态工厂方法创建**、**实例工厂方法创建**
@@ -335,3 +345,47 @@ idref和ref的区别在于 idref注入的是Bean的id的值，相当于注入的
                 </props>
             </property>
         </bean>
+        
+#### depends-on
+depends-on是\<bean>标签中的属性。当一个bean需要依赖另外一个bean时，但是又不是很明显的引用时，就可以使用depends-on属性。
+简单的讲，如果Bean A在初始化之前一定需要Bean B先初始化.那么BeanA就 depends-on BeanB。
+    
+    <bean id="BeanA" class = "bean.BeanA" depends-on = "BeanB"/>
+    
+    <bean id = "BeanB" class = "bean.BeanB"/>
+
+如果依赖多个Bean，在depends-on属性的值就是多个bean，用逗号隔开
+
+    <bean id="BeanA" class = "bean.BeanA" depends-on = "BeanB,BeanC"/>
+        
+    <bean id = "BeanB" class = "bean.BeanB"/>
+    <bean id = "BeanC" class = "bean.BeanC"/>
+    
+#### 延迟加载lazy-init
+Spring的IOC容器在初始化时会解析配置元数据，然后创建并装配所有单例的Bean实例。有时候我们有需求，并不想让所有单例Bean在IOC容器初始化时被装配。
+而是在第一次使用这个Bean时才让它加载（和单例模式的懒汉模式一样一样的）
+lazy-init是 \<bean>标签的属性
+    
+    <bean id="BeanA" class = "bean.BeanA" lazy-init="true"/>
+
+#### 自动装配 autowire
+自动装配就是在实例化bean对象时，将bean的属性自动注入。一般是引用类型的属性才支持自动注入（不包括String和数组这类引用类型）。
+autowire 是 \<bean>标签中的属性。
+
+**autowire="no"** 表示没有自动装配
+> \<bean name="config9" autowire="no" class="cn.ycl.study.ioc.bean.Config"/>
+
+**autowire="byName"** 当bean(config9)属性的名称和ioc容器中某个bean（A）的**名称一致且类型一致**时，就会将这个bean（A）注入到bean(config9)对应的属性中。
+找不到就不装配
+> \<bean name="config9" autowire="byName" class="cn.ycl.study.ioc.bean.Config"/>
+
+**autowire="byType"** 当bean(config9)属性的类型和ioc容器中某个bean（A）的类型一致时，就会将这个bean（A）注入到bean(config9)对应的属性中。
+如果和bean(A)的类型一致的Bean在ioc容器中还存在对个，就会报错。找不到就不装配
+
+**autowire="constructor"** 这个适用于以构造函数自动注入的方式。等待装配的Bean中构造函数中**所有的参数必须在ioc容器中都存在bean实例**，否则不会注入任何参数。
+
+1. 查找属性的相同类型的所有bean的列表
+2. 在列表中查找和属性名称相同的bean，找到之后注入
+3. 如果找不到称相同的bean，但是列表中只有**一个**和属性类型相同的bean,就**装配**这个bean
+4. 如果找不到称相同的bean，但是列表中只有**多个**和属性类型相同的bean,那么**不装配**，也不报错
+

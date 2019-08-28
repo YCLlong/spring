@@ -1,5 +1,6 @@
 package cn.ycl.study.ioc;
 
+import cn.ycl.study.ioc.bean.AutowireConfig;
 import cn.ycl.study.ioc.bean.Config;
 import cn.ycl.study.ioc.bean.ValueConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -99,10 +100,19 @@ public class Main {
         System.out.println(config);
     }
 
+    /**
+     * 自动装配
+     */
+    public void autowire(){
+        ApplicationContext context = getContrext();
+        AutowireConfig config = (AutowireConfig) context.getBean("config9");
+        System.out.println(config);
+    }
+
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.complexPropertiesDi();
+        main.autowire();
     }
 
     public static ApplicationContext getContrext(){

@@ -10,7 +10,7 @@
     <alias name="h1" alias="h2"></alias>
     <alias name="h1" alias="h3"></alias>
     <bean id="helloIOC" name="h1,h11"  class="cn.ycl.study.ioc.HelloIOC">
-        <constructor-arg name="desc" value="123"></constructor-arg>
+        <constructor-arg name="desc" value="123构造函数注入"></constructor-arg>
     </bean>
 
     <!--构造函数创建对象-->
@@ -145,4 +145,10 @@
             </props>
         </property>
     </bean>
+
+    <!--自动装配-->
+    <bean id="vlueConfig"  class="cn.ycl.study.ioc.HelloIOC">
+        <constructor-arg name="desc" value="自动装配"></constructor-arg>
+    </bean>
+    <bean name="config9" autowire="constructor" class="cn.ycl.study.ioc.bean.AutowireConfig"/>
 </beans>
