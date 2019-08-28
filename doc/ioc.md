@@ -108,7 +108,7 @@ ioc容器查找一个Bean时常见的两种方法，**通过类类型查找**，
 #### 通过类类型查找  ClassType
 通过类类型查找可以准确无误的找到指定类型的bean,但是当ioc容器中同一种类型的bean不止一个的时候就会报错
 
-### 通过bean的标识找
+#### 通过bean的标识找
 我们创建bean时，有id,name,还有alias。这些都可以作为bean的标识。
 在同一个bean中，id和name可以一致，但是不同bean中，id和name还有别名都必须唯一
 同时指定了id和name，那么id就是标识，name就相当于是别名
