@@ -3,6 +3,7 @@ package cn.ycl.study.ioc;
 import cn.ycl.study.ioc.bean.AutowireConfig;
 import cn.ycl.study.ioc.bean.Config;
 import cn.ycl.study.ioc.bean.ValueConfig;
+import cn.ycl.study.ioc.expond.TestLifeInterfaceBean;
 import cn.ycl.study.ioc.methoddi.BeanA;
 import cn.ycl.study.ioc.methoddi.BeanB;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -129,10 +130,29 @@ public class Main {
         System.out.println(desc);
     }
 
+    /**
+     * bean声明周期扩展
+     */
+    public void expondLifeInterface(){
+        ApplicationContext context = getContrext();
+        TestLifeInterfaceBean bean = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        //按照猜想，得到单例的bean后，将它指向null。后面从容器获取这个bean时理论上是Null。但是结果是配置数据装配后的bean
+        bean = null;
+        System.gc();
+        TestLifeInterfaceBean bean1 = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        TestLifeInterfaceBean bean2 = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        System.out.println(bean1 == bean2);//结果返回true
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-    public static void main(String[] args) {
+
+   public static void main(String[] args) {
         Main main = new Main();
-        main.replaceDi();
+        main.expondLifeInterface();
     }
 
     public static ApplicationContext getContrext(){

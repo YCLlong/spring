@@ -166,4 +166,10 @@
         <replaced-method  name="getDesc" replacer="replaceBeanA"/>
     </bean>
 
+    <!--生命周期-->
+    <bean name="config10" class="cn.ycl.study.ioc.bean.Config" scope="prototype"/>
+
+    <!--bean的扩展点-->
+    <bean name="expondLifeInterface" class="cn.ycl.study.ioc.expond.TestLifeInterfaceBean" init-method="afterPropertiesSet" destroy-method="destroy"/>
+
 </beans>
