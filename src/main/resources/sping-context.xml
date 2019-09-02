@@ -177,4 +177,7 @@
     <!--默认的初始化和销毁方法回调-->
     <bean name="life" class="cn.ycl.study.ioc.bean.BeanLife"/>
 
+    <!--BeanNameAware接口测试-->
+    <bean name="beanNameWare" class="cn.ycl.study.ioc.bean.BeanNameAwareTest"/>
+
 </beans>

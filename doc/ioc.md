@@ -686,9 +686,78 @@ default-init-method，default-destroy-method两个属性，是根标签\<beans>�
 
 
 ### 启动和关闭的回调
+有点让人疑惑的回调，我们已经有了初始化和销毁的方法回调，那么这个启动和暂停的回调的业务场景在哪儿目前我还不清楚。
+打开软件，播放视频，暂停视频，播放视频，关闭软件，这样和初始化销毁的回调区分。
+Spring提供了Lifecycle 接口，如下，任何由IOC容器管理的对象都可以实现这个接口。
 
-public interface Lifecycle {
-    void start();
-    void stop();
-    boolean isRunning();
-}
+    public interface Lifecycle {
+        void start();
+        void stop();
+        boolean isRunning();
+    }
+    
+如果有相关的需求，再看官方文档。
+
+## ApplicationContextAware和BeanNameAware
+ApplicationContextAware接口中只有一个setApplicationContext的方法。
+>其中方法的参数 就是当前IOC容器的具体实例。我们可以通过这个接口得到ioc容器实例对象。
+
+    public interface ApplicationContextAware {
+        void setApplicationContext(ApplicationContext applicationContext) throws BeansException;
+    }
+    
+同理BeanNameAware接口中只有一个setBeanName(String name) 方法
+    
+    public class BeanNameAwareTest implements BeanNameAware {
+        public void setBeanName(String name) {
+            System.out.println(name);
+        }
+    }
+
+> 当我们的bean实现了这个接口之后，实例化bean对象时，通过setBeanName方法的参数就能拿到当前bean的name.
+
+## 其他的Aware
+Aware(意识到，知道，明白)
+>Spring提供了很多Aware接口的扩展，通过这些接口我们可以获取到很多IOC环境中的对象
+
+ | 接口 | 接口中的方法 | 
+ | ----- | ---- |
+ |ApplicationContextAware| setApplicationContext(ApplicationContext applicationContext)|
+ |ApplicationEventPublisherAware| setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher)|
+ |BeanClassLoaderAware| setBeanClassLoader(ClassLoader classLoader)|
+ |BeanFactoryAware| setBeanFactory(BeanFactory beanFactory)|
+ |BeanNameAware| setBeanName(String name)|
+ |ResourceLoaderAware| setResourceLoader(ResourceLoader resourceLoader)|
+ |ResourceLoaderAware| setResourceLoader(ResourceLoader resourceLoader)|
+ |MessageSourceAware| setMessageSource(MessageSource messageSource)|
+ |LoadTimeWeaverAware| setLoadTimeWeaver(LoadTimeWeaver loadTimeWeaver)|
+ |NotificationPublisherAware| setNotificationPublisher(NotificationPublisher notificationPublisher)|
+ |BootstrapContextAware| |
+ |ServletConfigAware| |
+ |ServletContextAware| |
+ 
+ 
+# 定义bean的继承
+在java中，继承的关键字是extends，
+>在bean的定义中，定义的信息也可以继承,当然java代码中需要存在继承关系
+
+    <bean id="inheritedTestBean" abstract="true"
+            class="org.springframework.beans.TestBean">
+        <property name="name" value="parent"/>
+        <property name="age" value="1"/>
+    </bean>
+    
+    <bean id="inheritsWithDifferentClass"
+            class="org.springframework.beans.DerivedTestBean"
+            parent="inheritedTestBean" init-method="initialize">  
+        <property name="name" value="override"/>
+        <!-- the age property value of 1 will be inherited from parent -->
+    </bean>
+
+在java代码中 inheritsWithDifferentClass 是 inheritedTestBean的子类。
+在 inheritsWithDifferentClass的定义中，使用parent属性执行父类bean的定义。就等于继承了父类的定义信息。
+由于在子类中，没有显示的配置 age 属性的值，那么age就会从父类继承。
+
+#IOC容器扩展点
+
+

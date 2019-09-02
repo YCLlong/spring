@@ -1,9 +1,6 @@
 package cn.ycl.study.ioc;
 
-import cn.ycl.study.ioc.bean.AutowireConfig;
-import cn.ycl.study.ioc.bean.BeanLife;
-import cn.ycl.study.ioc.bean.Config;
-import cn.ycl.study.ioc.bean.ValueConfig;
+import cn.ycl.study.ioc.bean.*;
 import cn.ycl.study.ioc.expond.TestLifeInterfaceBean;
 import cn.ycl.study.ioc.methoddi.BeanA;
 import cn.ycl.study.ioc.methoddi.BeanB;
@@ -157,9 +154,14 @@ public class Main {
         System.out.println("程序执行完毕");
     }
 
+    public void beanNameAware(){
+        ApplicationContext context = getContrext();
+        BeanNameAwareTest lifecycle = context.getBean(BeanNameAwareTest.class);
+    }
+
    public static void main(String[] args) {
         Main main = new Main();
-        main.lifeConfig();
+        main.beanNameAware();
     }
 
     public static ApplicationContext getContrext(){
