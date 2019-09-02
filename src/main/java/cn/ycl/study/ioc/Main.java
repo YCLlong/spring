@@ -1,6 +1,7 @@
 package cn.ycl.study.ioc;
 
 import cn.ycl.study.ioc.bean.AutowireConfig;
+import cn.ycl.study.ioc.bean.BeanLife;
 import cn.ycl.study.ioc.bean.Config;
 import cn.ycl.study.ioc.bean.ValueConfig;
 import cn.ycl.study.ioc.expond.TestLifeInterfaceBean;
@@ -8,6 +9,7 @@ import cn.ycl.study.ioc.methoddi.BeanA;
 import cn.ycl.study.ioc.methoddi.BeanB;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.Lifecycle;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
@@ -149,14 +151,21 @@ public class Main {
         }
     }
 
+    public void lifeConfig(){
+        ApplicationContext context = getContrext();
+        BeanLife lifecycle = context.getBean(BeanLife.class);
+        System.out.println("程序执行完毕");
+    }
 
    public static void main(String[] args) {
         Main main = new Main();
-        main.expondLifeInterface();
+        main.lifeConfig();
     }
 
     public static ApplicationContext getContrext(){
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:sping-context.xml");
+        //注册回调钩子，可以保证程序关闭时，能够回调bean的destory方法，从而释放资源
+        context.registerShutdownHook();
         return context;
     }
 }

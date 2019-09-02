@@ -2,7 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-init-method="initBean"
+       default-destroy-method="destroyBean">
 
     <!--可以通过import标签引入其他位置的配置文件-->
     <import resource="spring-service.xml"></import>
@@ -171,5 +173,8 @@
 
     <!--bean的扩展点-->
     <bean name="expondLifeInterface" class="cn.ycl.study.ioc.expond.TestLifeInterfaceBean" init-method="afterPropertiesSet" destroy-method="destroy"/>
+
+    <!--默认的初始化和销毁方法回调-->
+    <bean name="life" class="cn.ycl.study.ioc.bean.BeanLife"/>
 
 </beans>

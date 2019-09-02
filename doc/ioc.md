@@ -624,3 +624,71 @@ SpringFramework提供了许多可用于可自定义bean特性的接口。比如b
 ### 基于配置元（提倡这种方式）
 
     <bean name="expondLifeInterface" class="cn.ycl.study.ioc.expond.TestLifeInterfaceBean" init-method="afterPropertiesSet" destroy-method="destroy"/>
+    
+测试的时候发现，**初始化**的时候方法确实回调了，但是程序结束后,**销毁**的方法并没有回调。
+当程序结束之后，我们可以通过注册钩子程序(context.registerShutdownHook())，让程序结束前，调用我们定义的destroy方法进行资源的释放。
+
+    public static ApplicationContext getContrext(){
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:sping-context.xml");
+        //注册回调钩子，可以保证程序关闭时，能够回调bean的destory方法，从而释放资源
+        context.registerShutdownHook();
+        return context;
+    }
+    
+我们也没有必要在配置每一个bean的时候定义初始化和回调方法，比较麻烦，可以配置默认的回调方法。
+default-init-method，default-destroy-method两个属性，是根标签\<beans>中的属性。
+
+    <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-init-method="initBean"
+       default-destroy-method="destroyBean">
+
+这样定义之后，默认的初始化方法就是initBean,默认的销毁方法就是destroyBean,如果Bean中定义了这个方法就回调，如果没有定义就不会被回调
+然后我们需要在自己定义的bean中写这两个方法,即使类型是private也能正常回调
+
+> 如果我们定义了默认的回调方法同时显示的指定了回调方法，那么默认的回调方法就不会被执行
+
+    //bean,将方法的修饰符定义为privite也能正常调用
+    public class BeanLife {
+        private void initBean(){
+            System.out.println("默认初始化bean的方法被调用");
+        }
+    
+        private void destroyBean(){
+            System.out.println("默认初始化销毁bean的方法被调用");
+        }
+    }
+    
+    //测试调用
+    public void lifeConfig(){
+        ApplicationContext context = getContrext();
+        Lifecycle lifecycle = context.getBean(Lifecycle.class);
+        System.out.println("程序执行完毕");
+    }
+    
+    //运行结果【可以通过顺序查看自定义初始化和销毁方法和默认初始化和销毁的方法的执行顺序】
+    开始执行自定义的初始化扩展方法
+    desc=null
+    默认初始化bean的方法被调用
+    程序执行完毕
+    默认初始化销毁bean的方法被调用
+    bean销毁，开始执行扩展的销毁方法
+    desc=null自定义初始化
+    
+ ###基于注解
+ >@PostConstruct     注释的方法在bean初始化时回调
+ 
+ >@PreDestroy        注释的方法会在bean销毁时回调
+ 
+ 它们都是基于方法的注解。
+
+
+### 启动和关闭的回调
+
+public interface Lifecycle {
+    void start();
+    void stop();
+    boolean isRunning();
+}
