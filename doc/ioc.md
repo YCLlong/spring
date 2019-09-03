@@ -842,4 +842,27 @@ IOC容器也提供了很多扩展点，对于容器而言，它管理者bean，�
     	}
     }
     
+    
+ 自定义一个创建用户的工厂类，实现FactoryBean接口
+ 
+    public class UserFactory implements FactoryBean<User> {
+        //返回工厂创建的Bean对象
+        @Override
+        public User getObject() throws Exception {
+            return new User();
+        }
+    
+        //返回对象的类型
+        @Override
+        public Class<?> getObjectType() {
+            return User.class;
+        }
+    
+        //是否是单例模式，false表示否，则是多利模式
+        @Override
+        public boolean isSingleton() {
+            return false;
+        }
+    }
+    
 # IOC 容器实例化过程和Bean实例化过程（小的总结）
