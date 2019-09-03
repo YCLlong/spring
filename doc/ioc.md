@@ -818,7 +818,8 @@ IOC容器也提供了很多扩展点，对于容器而言，它管理者bean，�
 ## IOC容器初始化之后回调
 >实现接口 BeanFactoryPostProcessor
 
-当IOC容器初始化完毕之后（已经根据配置元信息初始化好了bean），就会回调这个接口的所有子类。
+当IOC容器初始化完毕之后,**已经根据配置元信息创建好了BeanDefinition对象，但是还没有创建真正的bean对象**，就会回调这个接口的所有子类。
+通过这个接口，我们可以在容器初始化之后，读取和修改容器中的bean的配置源信息。
 
 您可以配置多个BeanFactoryPostProcessor实例，并且可以BeanFactoryPostProcessor通过设置order属性来控制这些实例的运行顺序。但是，如果BeanFactoryPostProcessor实现 Ordered接口，则只能设置此属性。如果你自己编写BeanFactoryPostProcessor，你也应该考虑实现这个Ordered接口。有关更多详细信息，请参阅BeanFactoryPostProcessor和Ordered接口的javadoc 。
 
@@ -826,4 +827,19 @@ IOC容器也提供了很多扩展点，对于容器而言，它管理者bean，�
 	    void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
     }
     
+## 自定义Bean实例化逻辑
+>实现接口 FactoryBean
+
+    public interface FactoryBean<T> {
+    	@Nullable
+    	T getObject() throws Exception;
     
+    	@Nullable
+    	Class<?> getObjectType();
+
+    	default boolean isSingleton() {
+    		return true;
+    	}
+    }
+    
+# IOC 容器实例化过程和Bean实例化过程（小的总结）

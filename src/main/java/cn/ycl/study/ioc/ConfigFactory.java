@@ -5,7 +5,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
-public class ConfigFactory implements BeanFactoryPostProcessor {
+public class ConfigFactory implements BeanFactoryPostProcessor{
 
     public static Config createConfig(){
         Config config = new Config();
@@ -26,6 +26,14 @@ public class ConfigFactory implements BeanFactoryPostProcessor {
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         for (String name:beanFactory.getBeanDefinitionNames()){
             System.out.println("ioc:" + name);
+            Object test =  beanFactory.getBean(name);
+            if(test instanceof HelloIOC){
+                HelloIOC helloIOC = (HelloIOC) test;
+                helloIOC.hello();
+            }
+
         }
+
+
     }
 }
