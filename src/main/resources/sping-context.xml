@@ -180,4 +180,7 @@
     <!--BeanNameAware接口测试-->
     <bean name="beanNameWare" class="cn.ycl.study.ioc.bean.BeanNameAwareTest"/>
 
+    <!--这个bean实现了特定的接口，可以得到 BeanDefinitionRegistry对象，通过这个对象可以动态的像容器注册bean-->
+    <bean name="registerBean" class="cn.ycl.study.ioc.bean.RegisterBean"/>
+
 </beans>

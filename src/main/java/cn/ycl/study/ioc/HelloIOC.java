@@ -15,4 +15,8 @@ public class HelloIOC {
     public void hello(){
         System.out.println("hello ioc");
     }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 }

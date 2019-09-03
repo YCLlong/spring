@@ -74,6 +74,26 @@ bean是IOC容器管理的对象，在IOC容器中 Bean定义表示为 **org.spri
         System.out.println(bean.getName());
     }
     
+    
+>自定义组件实现 BeanDefinitionRegistryPostProcessor 
+
+    public class RegisterBean implements BeanDefinitionRegistryPostProcessor {
+        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+            for(int i=0; i<10; i++){
+                BeanDefinitionBuilder db =  BeanDefinitionBuilder.rootBeanDefinition(HelloIOC.class);
+                db.addPropertyValue("desc","动态注册bean" + i);
+                db.addConstructorArgValue("构造函数注入");
+                registry.registerBeanDefinition("testRegisterBean" + i,db.getBeanDefinition());
+            }
+        }
+    
+        public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+            for (String name:beanFactory.getBeanDefinitionNames()){
+                System.out.println(name);
+            }
+        }
+    }
+    
 > 建议不要使用这个方式注册bean。
 我们应该需要尽早注册Bean元数据和手动提供的单例实例，以便容器在自动装配和其他内省步骤期间正确推理它们。虽然在某种程度上支持覆盖现有元数据和现有单例实例，但是在运行时注册新bean（与对工厂的实时访问同时）并未得到官方支持，并且可能导致并发访问异常，bean容器中的状态不一致
     
@@ -684,7 +704,6 @@ default-init-method，default-destroy-method两个属性，是根标签\<beans>�
  
  它们都是基于方法的注解。
 
-
 ### 启动和关闭的回调
 有点让人疑惑的回调，我们已经有了初始化和销毁的方法回调，那么这个启动和暂停的回调的业务场景在哪儿目前我还不清楚。
 打开软件，播放视频，暂停视频，播放视频，关闭软件，这样和初始化销毁的回调区分。
@@ -759,5 +778,52 @@ Aware(意识到，知道，明白)
 由于在子类中，没有显示的配置 age 属性的值，那么age就会从父类继承。
 
 #IOC容器扩展点
+IOC容器也提供了很多扩展点，对于容器而言，它管理者bean，从每一个bean的创建，初始化，DI，初始化完毕，销毁。容器都会非常清楚，所以容器也向开发者提供了很多扩展点。
+让开发者知道bean的状态，只要实现指定的接口，ioc容器在对bean操作时去回调这个接口的子类，从而达到扩展的效果。
+##  Bean初始化时回调和初始化完毕之后的回调
+>实现接口 BeanPostProcessor
+
+在Spring容器创建对象时，每一个对象产生之前(如果配置源定义了属性的注入，那么这时属性的注入已经完成)都会调用 postProcessBeforeInitialization 方法，然后再调用init方法，最后再调用postProcessAfterInitialization 方法
+
+您可以配置多个BeanPostProcessor实例，并且可以BeanPostProcessor通过设置order属性来控制这些实例的执行顺序。只有在BeanPostProcessor实现Ordered 接口时才能设置此属性。如果你自己编写BeanPostProcessor，你也应该考虑实现这个Ordered接口。有关更多详细信息，请参阅BeanPostProcessor 和Ordered接口的javadoc 。另见关于实例的程序化登记BeanPostProcessor的说明。、
+
+    public interface BeanPostProcessor {
+    	@Nullable
+    	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    		return bean;
+    	}
+    	@Nullable
+    	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    		return bean;
+    	}
+    }
+    
+    @Component
+    public class BeanProgress implements BeanPostProcessor {
+        @Override
+        public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+            System.out.println("==============postProcessBeforeInitialization================" + beanName + "===" + bean.getClass());
+            return bean;
+        }
+    
+        @Override
+        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+            System.out.println("==============postProcessAfterInitialization================" + beanName + "===" + bean.getClass());
+            return bean;
+        }
+    }
 
 
+
+## IOC容器初始化之后回调
+>实现接口 BeanFactoryPostProcessor
+
+当IOC容器初始化完毕之后（已经根据配置元信息初始化好了bean），就会回调这个接口的所有子类。
+
+您可以配置多个BeanFactoryPostProcessor实例，并且可以BeanFactoryPostProcessor通过设置order属性来控制这些实例的运行顺序。但是，如果BeanFactoryPostProcessor实现 Ordered接口，则只能设置此属性。如果你自己编写BeanFactoryPostProcessor，你也应该考虑实现这个Ordered接口。有关更多详细信息，请参阅BeanFactoryPostProcessor和Ordered接口的javadoc 。
+
+    public interface BeanFactoryPostProcessor {
+	    void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
+    }
+    
+    

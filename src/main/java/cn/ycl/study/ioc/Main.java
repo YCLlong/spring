@@ -4,9 +4,7 @@ import cn.ycl.study.ioc.bean.*;
 import cn.ycl.study.ioc.expond.TestLifeInterfaceBean;
 import cn.ycl.study.ioc.methoddi.BeanA;
 import cn.ycl.study.ioc.methoddi.BeanB;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.Lifecycle;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
@@ -159,9 +157,15 @@ public class Main {
         BeanNameAwareTest lifecycle = context.getBean(BeanNameAwareTest.class);
     }
 
+    public void registerBeanTest(){
+        ApplicationContext context = getContrext();
+        context.getBean(RegisterBean.class);
+    }
+
    public static void main(String[] args) {
         Main main = new Main();
-        main.beanNameAware();
+        main.lifeConfig();
+
     }
 
     public static ApplicationContext getContrext(){
