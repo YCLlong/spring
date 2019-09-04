@@ -50,7 +50,106 @@
     这个注解会导入更多的注解解析器，包括上面的4个解析器，加入这个注解之后 \<context:annotation-config/> 就不需要了。
     因为< context:annotation-config />和 < context:component-scan>同时存在的时候，前者会被忽略。
 
-    
-    
-    
 
+# @Autowired
+这个注解的英文意思是【自动装配】,它的功能就和名字一样，提供了自动装配的功能，这个注解功能非常的强大，注解的源码如下。
+通过源码，我们发现这个注解可以用到构造函数、方法、属性、参数之上。
+
+    @Target({ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface Autowired {
+    
+    	/**
+    	 * Declares whether the annotated dependency is required.
+    	 * <p>Defaults to {@code true}.
+    	 */
+    	boolean required() default true;
+    
+    }
+
+## @Autowired的值required
+我们发现required默认值是true，表示强制需要的意思，如果自动装配的过程中ioc容器中不存在这个类型的值就会直接抛出异常。
+当这个值是false是标表示并不是强制需要的，如果ioc容器中不存在值就会忽略，也就是并不会装配。
+
+## 实例
+
+注解直接用于字段，直接注入属性
+用于方法，注解解析器会利用反射技术调用这个方法，并将参数注入进入。前提是所有的参数都能在ioc容器中找到合适类型
+
+ 
+    @Component
+    public class AutowiredBean {
+        private String desc;
+        /**
+         * 注入到字段中
+         */
+        @Autowired
+        private XmlToAnnotationBean bean;
+    
+        @Autowired
+        private ApplicationContext context;
+    
+       // @Autowired() 这样会报错，因为desc
+        public AutowiredBean(XmlToAnnotationBean bean,String desc){
+            this.bean = bean;
+            this.desc = desc;
+        }
+    
+        /**
+         * 注入到构造函数的参数中
+         * @param bean
+         */
+        @Autowired()
+        public AutowiredBean(XmlToAnnotationBean bean){
+            this.bean = bean;
+        }
+    
+    
+        /**
+         * 自动注入到普通的方法的参数中
+         * @param bean
+         */
+        @Order(2)
+        @Autowired
+        public void normalMethod(XmlToAnnotationBean bean){
+            System.out.println("调用");
+        }
+    
+        /**
+         * 我们发现，调用 context.getBean时， @Autowired 注解的方法都会被提前调用一遍
+         * 方法中的参数已经被自动注入了值。我尝试者加个@Order 注解，控制这个调用的顺序，但是实际上没有起到作用。
+         * 调用顺序是从上到下来的
+         * @param bean
+         */
+        @Order(1)
+        @Autowired
+        public void normalMethod1(XmlToAnnotationBean bean){
+            System.out.println("调用");
+        }
+    
+        /**
+         * 注解用到参数上，但是没有反应
+         * @param bean
+         * @param desc
+         */
+        public void diParam(@Autowired XmlToAnnotationBean bean,String desc){
+            System.out.println(bean.getClass());
+        }
+    ｝
+    
+    
+    //调用入口
+    public void autowried(){
+        System.out.println("开始执行");
+        ApplicationContext context = getContext();
+        AutowiredBean bean = context.getBean(AutowiredBean.class);
+        bean.normalMethod(null);
+    }
+    
+    
+## 发现
+我们惊奇的发现，当执行到getContext();这行代码时，实例中的normalMethod和normalMethod1这两个方法就被调用了。
+
+调用时，参数已经被成功注入了。我猜想，
+>当Spring IOC容器实例化时，就会读取类中的注解的值，其实就是在读取配置元数据。当碰到@Autowired这个注解时，就交给注解解析器AutowiredAnnotationBeanPostProcessor去解析。注解解析器利用反射技术，直接调用类中的方法，并注入参数。

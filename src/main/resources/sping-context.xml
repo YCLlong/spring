@@ -6,7 +6,6 @@
        default-init-method="initBean"
        default-destroy-method="destroyBean">
 
-    <context:component-scan base-package="cn.ycl.study"/>
     <!--可以通过import标签引入其他位置的配置文件-->
     <import resource="spring-service.xml"></import>
 
