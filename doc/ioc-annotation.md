@@ -50,6 +50,11 @@
     这个注解会导入更多的注解解析器，包括上面的4个解析器，加入这个注解之后 \<context:annotation-config/> 就不需要了。
     因为< context:annotation-config />和 < context:component-scan>同时存在的时候，前者会被忽略。
 
+# 同时使用注解配置和配置文件遇到的坑
+
+## 当配置文件的bean和注解配置的bean的标识相同时
+
+配置文件的配置会直接覆盖掉注解的1配置
 
 # @Autowired
 这个注解的英文意思是【自动装配】,它的功能就和名字一样，提供了自动装配的功能，这个注解功能非常的强大，注解的源码如下。
@@ -191,6 +196,8 @@ ioc容器自动装配时，就会注入这个拥有@Primary 注解的bean.
 > 配置文件中primary的配置  \<bean class="example.SimpleMovieCatalog" primary="true">
 
 # @Qualifier
+Qualifier n. 限定词，[语] 限定语；取得资格的人；修饰语
+
 上面的@Primary注解是确定要装配相同类型中的具体的一个Bean时，可以使用这个注解指定，但是确实不太灵活。
 > ioc容器中相同类型的bean有很多个，但是bean的名称是唯一的。使用@Qulifier注解可以更具相同类型的bean的名称指定装配
 
@@ -201,3 +208,159 @@ ioc容器自动装配时，就会注入这个拥有@Primary 注解的bean.
         public Person person;
     }
 
+这个限定词同时可以用于参数上，当自动装配注入到参数上时依然会出现不知道选择哪个bean注入的情况。
+
+    public class PrimaryTest {
+        @Autowired
+        //指定person2装配
+        @Qualifier("person2")
+        public Person person;
+    
+        private Person privatePerson;
+    
+        @Autowired
+        private void init(@Qualifier("person1") Person person){
+            this.privatePerson = privatePerson;
+        }
+    }
+那在xml配置文件中怎么使用限定符注解呢？
+    
+    <bean class="example.SimpleMovieCatalog">
+        <qualifier value="main"/> 
+        <!-- inject any dependencies required by this bean -->
+    </bean>
+## 自定义限定符
+Spring提供的@Qualifier 这个限定符注解，可以根据bean的名称按照限定的名称进行装配。同时这个注解解析器提供了扩展的功能。
+
+### 自定义注解的应用过程
+1. 自定义一个注解，在注解上加上@Qualifier
+2. 在bean的配置元数据中指定注解的类型，如果有值需要配置指定的值
+3. 和@Qualifier一样将注解用于参数，成员属性，或者方法上
+4. Spring的注解解析器会解析我们的注解，然后根据bean的配置信息中我们定义的信息进行匹配
+
+> 新建一个注解，再自定义的注解上加上@Qualifier，那么Spring的注解解析器就能解析我们自定义的注解。
+
+我们新建一个注解，注解内没有任何的值
+### 自定义注解
+    @Target({ElementType.METHOD,ElementType.FIELD,ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    //加上这个注解Spring的@Qualifier注解解析器也能解析我们的注解
+    @Qualifier
+    public @interface Offline {
+    
+    }
+### 在bean中配置限定
+
+    <!--自定义限定符-->
+    <bean name="qulifierSelf" class="cn.ycl.study.annotation.SelfQulifier">
+        <!--加上了限定符，如果项目中有限定符的使用，这个信息就会起到匹配的作用，否则毫无用处-->
+        <qualifier type="cn.ycl.study.annotation.Offline"/>
+    </bean>
+
+    <bean name="qulifierTest" class="cn.ycl.study.annotation.SelfQulifier">
+    </bean> 
+
+### 在代码中自动装配这个bean
+    
+    public class QulifierTest {
+        public SelfQulifier qulifier;
+    
+        //由于在ioc容器中声明了两个类型一致的SelfQulifier bean,这样自动装配会直接报错
+        @Autowired
+        private void test(SelfQulifier qulifier){
+            this.qulifier = qulifier;
+        }
+    }
+    
+调用
+    
+     public void selfQulifier(){
+        ApplicationContext context = getContext();
+        //如果没有这句，不会触发自动装配
+        context.getBean(QulifierTest.class);
+        System.out.println("11");
+    }
+
+### 使用限定符注解
+    
+    public class QulifierTest {
+    
+        public SelfQulifier qulifier;
+    
+        //由于在ioc容器中声明了两个类型一致的SelfQulifier bean,这样自动装配会直接报错
+        @Autowired
+        //使用自定义限定符注解，会从配置元数据中读取限定符信息。如果读取到多个相同类型具有相同的限定符信息时也会报错
+        @Offline
+        private void test(SelfQulifier qulifier){
+            this.qulifier = qulifier;
+        }
+    }
+
+加上Offline注解之后就OK了，就会装配在配置文件中指定了修饰限定符的那个bean
+
+### 自定义注解之修饰限定符属性值。
+如果仅仅只是自定义限定符的类型扩展度不够，Spring的注解解析器允许自定义的修饰限定符加上参数，根据多个参数的属性同时限定
+
+#### 自定义注解中加入属性
+    @Target({ElementType.METHOD,ElementType.FIELD,ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    //加上这个注解Spring的@Qualifier注解解析器也能解析我们的注解
+    @Qualifier
+    public @interface Offline {
+        //我们可以自定义属性,不加上 default，就是必须的参数
+        String name();
+        int level() default 0;
+    }
+#### 配置文件中配置限定符
+      <!--自定义限定符-->
+        <bean name="qulifierSelf" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+            <!--加上了限定符，如果项目中有限定符的使用，这个信息就会起到匹配的作用，否则毫无用处-->
+            <qualifier type="cn.ycl.study.annotation.qulifier.Offline">
+                <attribute key="name" value="test"></attribute>
+                <attribute key="level" value="1"></attribute>
+            </qualifier>
+            <property name="desc" value="龙哥"/>
+        </bean>
+    
+        <bean name="qulifierTest" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+            <qualifier type="cn.ycl.study.annotation.qulifier.Offline">
+                <attribute key="name" value="test"></attribute>
+            </qualifier>
+            <property name="desc" value="焦妹"/>
+        </bean>
+        
+#### java代码中使用自定义注解，并配置属性
+
+    public class QulifierTest {
+
+        public SelfQulifier qulifier;
+    
+        //由于在ioc容器中声明了两个类型一致的SelfQulifier bean,这样自动装配会直接报错
+        @Autowired
+        //使用自定义限定符注解，会从配置元数据中读取限定符信息。如果读取到多个相同类型具有相同的限定符信息时也会报错
+        @Offline(name = "test")
+        private void test(SelfQulifier qulifier){
+            //焦妹
+            this.qulifier = qulifier;
+        }
+    
+        @Autowired
+        @Offline(name = "test",level = 1)
+        private void test1(SelfQulifier qulifier){
+            //龙哥
+            this.qulifier = qulifier;
+        }
+    } 
+
+#### \<bean>标签中的子标签 \<meta>
+    
+    <bean name="qulifierTest" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+        <meta key="name" value="test"/>
+        <meta key="level" value="0"/>
+        <property name="desc" value="焦妹"/>
+    </bean>
+ 
+ 我们发现 @Offline(name = "test") 这个自动注入也能注入焦妹。
+ > \<qualifier/>元素及其属性优先,但如果没有匹配到，则匹配 \<meta>中的值
+ 
+ 

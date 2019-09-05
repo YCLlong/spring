@@ -4,6 +4,23 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!--自定义限定符-->
+    <bean name="qulifierSelf" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+        <!--加上了限定符，如果项目中有限定符的使用，这个信息就会起到匹配的作用，否则毫无用处-->
+        <qualifier type="cn.ycl.study.annotation.qulifier.Offline">
+            <attribute key="name" value="test"></attribute>
+            <attribute key="level" value="1"></attribute>
+        </qualifier>
+        <property name="desc" value="龙哥"/>
+    </bean>
+
+    <bean name="qulifierTest" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+        <meta key="name" value="test"/>
+        <meta key="level" value="0"/>
+        <property name="desc" value="焦妹"/>
+    </bean>
+
     <context:component-scan base-package="cn.ycl.study"/>
+
 
 </beans>

@@ -8,4 +8,11 @@ public class PrimaryTest {
     //指定person2装配
     @Qualifier("person2")
     public Person person;
+
+    private Person privatePerson;
+
+    @Autowired
+    private void init(@Qualifier("person1") Person person){
+        this.privatePerson = privatePerson;
+    }
 }

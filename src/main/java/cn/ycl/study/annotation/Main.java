@@ -1,5 +1,6 @@
 package cn.ycl.study.annotation;
 
+import cn.ycl.study.annotation.qulifier.QulifierTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -25,10 +26,17 @@ public class Main {
         System.out.println(bean.person.getName());
     }
 
+    public void selfQulifier(){
+        ApplicationContext context = getContext();
+        //如果没有这句，不会触发自动装配
+        Object bean = context.getBean(QulifierTest.class);
+        System.out.println("11");
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
 
-        main.primaryTest();
+        main.selfQulifier();
 
     }
 
