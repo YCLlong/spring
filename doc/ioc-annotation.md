@@ -153,3 +153,51 @@
 
 调用时，参数已经被成功注入了。我猜想，
 >当Spring IOC容器实例化时，就会读取类中的注解的值，其实就是在读取配置元数据。当碰到@Autowired这个注解时，就交给注解解析器AutowiredAnnotationBeanPostProcessor去解析。注解解析器利用反射技术，直接调用类中的方法，并注入参数。
+
+# @Primary
+adj. 主要的；初级的；基本的
+
+当我们按照类型自动注入时，如果出现了多个类型就会报错，但是，加上这个注解之后，当出现相同类型的bean，会优先使用有这个注解的bean进行注入。
+
+    @Configuration
+    public class BeanConfig {
+        @Bean
+        @Primary
+        public Person person1(){
+            return new Person("龙哥",24);
+        }
+    
+        @Bean
+        public Person person2(){
+            return new Person("焦妹",24);
+        }
+    
+        @Bean
+        public PrimaryTest primaryTest(){
+            return new PrimaryTest();
+        }
+    }
+    
+    public class PrimaryTest {
+        @Autowired
+        public Person person;
+    }
+
+如测试用例中 PrimaryTest 类中注入了Person,而我们配置了两个Person的Bean的实例，自动注入时直接报错。在其中一个Bean上加了 @Primary之后，就不会报错了。
+ioc容器自动装配时，就会注入这个拥有@Primary 注解的bean.
+
+> 当我为两个Person Bean 加上@Prmary 注解时，也会报错
+
+> 配置文件中primary的配置  \<bean class="example.SimpleMovieCatalog" primary="true">
+
+# @Qualifier
+上面的@Primary注解是确定要装配相同类型中的具体的一个Bean时，可以使用这个注解指定，但是确实不太灵活。
+> ioc容器中相同类型的bean有很多个，但是bean的名称是唯一的。使用@Qulifier注解可以更具相同类型的bean的名称指定装配
+
+    public class PrimaryTest {
+        @Autowired
+        //指定person2装配
+        @Qualifier("person2")
+        public Person person;
+    }
+

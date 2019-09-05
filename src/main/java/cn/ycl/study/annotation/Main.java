@@ -18,10 +18,17 @@ public class Main {
         AutowiredBean bean = context.getBean(AutowiredBean.class);
         bean.normalMethod(null);
     }
+
+    public void primaryTest(){
+        ApplicationContext context = getContext();
+        PrimaryTest bean = context.getBean(PrimaryTest.class);
+        System.out.println(bean.person.getName());
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
 
-        main.autowried();
+        main.primaryTest();
 
     }
 
