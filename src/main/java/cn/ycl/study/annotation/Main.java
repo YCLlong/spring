@@ -12,6 +12,7 @@ public class Main {
         Main main = new Main();
         ApplicationContext getContext = getContext();
         main.testAnnotation(getContext);
+        //新建注解分支
 
     }
 
