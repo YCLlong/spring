@@ -194,5 +194,10 @@ ioc容器自动装配时，就会注入这个拥有@Primary 注解的bean.
 上面的@Primary注解是确定要装配相同类型中的具体的一个Bean时，可以使用这个注解指定，但是确实不太灵活。
 > ioc容器中相同类型的bean有很多个，但是bean的名称是唯一的。使用@Qulifier注解可以更具相同类型的bean的名称指定装配
 
-
+    public class PrimaryTest {
+        @Autowired
+        //指定person2装配
+        @Qualifier("person2")
+        public Person person;
+    }
 
