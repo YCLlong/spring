@@ -363,4 +363,237 @@ Spring提供的@Qualifier 这个限定符注解，可以根据bean的名称按�
  我们发现 @Offline(name = "test") 这个自动注入也能注入焦妹。
  > \<qualifier/>元素及其属性优先,但如果没有匹配到，则匹配 \<meta>中的值
  
+ > 配置限定符的信息目前只知道在配置文件中配置，使用注解目前还不知道能不能配置限定符信息
  
+ 
+ ### 使用泛型作为隐式限定符
+ 
+ 假设前面的bean实现了一个通用接口（即Store<String>和， Store<Integer>），您可以@Autowire将Store接口和泛型用作限定符，如下例所示：
+ 
+     @Autowired
+     private Store<String> s1; // <String> qualifier, injects the stringStore bean
+     
+     @Autowired
+     private Store<Integer> s2; // <Integer> qualifier, injects the integerStore bean
+ 
+ ### CustomAutowireConfigurer
+ CustomAutowireConfigurer 是一个BeanFactoryPostProcessor允许您注册自己的自定义限定符注释类型的，即使它们没有使用Spring的@Qualifier注释进行注释。
+    
+    //CustomAutowireConfigurer源码
+    public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
+    
+    	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
+    
+    	@Nullable
+    	private Set<?> customQualifierTypes;
+    
+    //配置自定义的限定符
+    <bean id="customAutowireConfigurer"
+            class="org.springframework.beans.factory.annotation.CustomAutowireConfigurer">
+        <property name="customQualifierTypes">
+            <set>
+                <value>example.CustomQualifier</value>
+            </set>
+        </property>
+    </bean>
+    
+# @Resource
+这个注解是java提供的注解，但是Spring框架中的注解解析器可以解析这个注解。这个注解的用法和@Autowried用法差不多。
+
+该注解可以用到方法上，属性上，可以自动注入。
+
+# @PostConstruct和@PreDestroy
+这两个注解也是java提供的注解。在bean的声明周期中介绍过。
+> @PostConstruct 注解的方法 会在容器初始化时就会调用
+
+# @Component
+component 英文是组件的意思，它是Spring管理的组件通用构造类型，**@Component作用于类上**。
+
+> @Component 可以将一个pojo类实例化到ioc容器中,相当于配置文件中的 \<bean id="" class=""/>
+
+> @Component和@Bean都是用来注册Bean并装配到Spring容器中，但是Bean比Component的自定义性更强。可以实现一些Component实现不了的自定义加载类。
+ 
+@Component是一个元注解，在这个注解之上Spring又扩展了
+
+     @Service
+     @Repository
+     @Controller
+     @Configuration
+     
+其中Service的源码,在@Service注解上有 @Component 注解
+
+     @Target({ElementType.TYPE})
+     @Retention(RetentionPolicy.RUNTIME)
+     @Documented
+     @Component
+     public @interface Service {
+     	@AliasFor(annotation = Component.class)
+     	String value() default "";
+     }
+     
+# @Scope
+这个注解和\<bean> 标签中的scope 作用一致，描述bean的范围。
+    @Scope("singleton")
+    @Scope("prototype")
+
+# @ComponentScan
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    @Documented
+    @Repeatable(ComponentScans.class)
+    public @interface ComponentScan {
+    
+    	@AliasFor("basePackages")
+    	String[] value() default {};
+    
+    	@AliasFor("value")
+    	String[] basePackages() default {};
+    
+    	Class<?>[] basePackageClasses() default {};
+    
+    	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
+
+    	Class<? extends ScopeMetadataResolver> scopeResolver() default AnnotationScopeMetadataResolver.class;
+    
+    	ScopedProxyMode scopedProxy() default ScopedProxyMode.DEFAULT;
+    
+    	String resourcePattern() default ClassPathScanningCandidateComponentProvider.DEFAULT_RESOURCE_PATTERN;
+    
+    	boolean useDefaultFilters() default true;
+    
+    	Filter[] includeFilters() default {};
+    
+    	Filter[] excludeFilters() default {};
+    
+    	boolean lazyInit() default false;
+    
+    
+    	/**
+    	 * Declares the type filter to be used as an {@linkplain ComponentScan#includeFilters
+    	 * include filter} or {@linkplain ComponentScan#excludeFilters exclude filter}.
+    	 */
+    	@Retention(RetentionPolicy.RUNTIME)
+    	@Target({})
+    	@interface Filter {
+
+    		FilterType type() default FilterType.ANNOTATION;
+    
+    		@AliasFor("classes")
+    		Class<?>[] value() default {};
+
+    		@AliasFor("value")
+    		Class<?>[] classes() default {};
+    
+    		String[] pattern() default {};
+    
+    	}
+    
+    }
+这个注解可以告诉它的解析器，去扫描指定路径下的组件，并将其注入到ioc容器中。
+
+@ComponentScan 注解提供了很多灵活的过滤器配置，比如过滤某些包或者路径不扫描，或者指定某些包或者路径去扫描，能使用表达式去匹配对应的路径。
+
+> 在一个类上使用@ComponentScan 注解，不设置任何值，那么就会扫描这个类所在的包以及子包下的所有目录，去提取目录中存在@Component注解的类，并将它注册到ioc容器中
+
+> 可以使用basePackage 属性指定扫描的根目录。我们要注意的是，如果根包下的不同子包下存在相同名字的类，只要其中的一个类需要自动装配或者要加入ioc容器中就会抱错，beanDefinition冲突。
+
+## 过滤器 
+@interface Filter 注解是 Component注解的子注解。
+
+过滤器的类型 
+
+    public enum FilterType {
+    
+        /**
+         * Filter candidates marked with a given annotation.
+         * @see org.springframework.core.type.filter.AnnotationTypeFilter
+         */
+        ANNOTATION,
+    
+        /**
+         * Filter candidates assignable to a given type.
+         * @see org.springframework.core.type.filter.AssignableTypeFilter
+         */
+        ASSIGNABLE_TYPE,
+    
+        /**
+         * Filter candidates matching a given AspectJ type pattern expression.
+         * @see org.springframework.core.type.filter.AspectJTypeFilter
+         */
+        ASPECTJ,
+    
+        /**
+         * Filter candidates matching a given regex pattern.
+         * @see org.springframework.core.type.filter.RegexPatternTypeFilter
+         */
+        REGEX,
+    
+        /** Filter candidates using a given custom
+         * {@link org.springframework.core.type.filter.TypeFilter} implementation.
+         */
+        CUSTOM
+    
+    }
+    
+    ANNOTATION：注解类型
+    ASSIGNABLE_TYPE：ANNOTATION：指定的类型
+    ASPECTJ：按照Aspectj的表达式，基本上不会用到
+    REGEX：按照正则表达式
+    CUSTOM：自定义规则
+    
+### 自定义过滤器规则
+实现 TypeFilter 接口的 boolean match 方法
+    
+    public class MyScanFilter implements TypeFilter {
+        public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
+            if (metadataReader.getClassMetadata().getClassName().contains("ExcludeBean")){
+                //获取当前类注解的信息
+                AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
+                for (String s : annotationMetadata.getAnnotationTypes()) {
+                    System.out.println("当前正在被扫描的类注解类型" + s);
+                }
+                //获取当前正在扫描类的信息
+                ClassMetadata classMetadata = metadataReader.getClassMetadata();
+                System.out.println("当前正在被扫描的类的类名" + classMetadata.getClassName());
+                //获取当前类的资源信息（类存放的路径...）
+                Resource resource = metadataReader.getResource();
+                System.out.println("当前正在被扫描的类存放的地址" + resource.getURL());
+                return true;
+            }
+            return false;
+        }
+    }
+ 
+在@ComponentScan.Filter注解中将类型定义为Filter.CUSTOM,将值设置成自定义注解的class
+    
+    @ComponentScan(excludeFilters = {@ComponentScan.Filter(type = FilterType.CUSTOM,value = MyScanFilter.class)})
+    public class ConfigApp {
+    }
+
+创建ioc实例对象
+
+    public static AnnotationConfigApplicationContext getAnnotationContext(){
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ConfigApp.class);
+        return context;
+    }
+    
+    public void componentScanTest(){
+        ApplicationContext context = getAnnotationContext();
+        context.getBean(ExcludeBean.class);
+        System.out.println("结束");
+    }
+
+运行结果
+
+    当前正在被扫描的类注解类型org.springframework.stereotype.Component
+    当前正在被扫描的类的类名cn.ycl.study.annotation.comonentscanfilter.ExcludeBean
+    当前正在被扫描的类存放的地址file:/E:/spring/target/classes/cn/ycl/study/annotation/comonentscanfilter/ExcludeBean.class
+    Exception in thread "main" org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'c
+    
+    因为过滤中通过我们自己的过滤逻辑匹配到返回了true，所以这个ExcludeBean就不会被扫描到，ioc容器中没有它的信息就会报错啦。
+    
+    
+    
+    
+    

@@ -27,4 +27,9 @@ public class BeanConfig {
         return new PrimaryTest();
     }
 
+    @Bean
+    public ResourceTest resource(){
+        return new ResourceTest();
+    }
+
 }
