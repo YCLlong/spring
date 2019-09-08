@@ -1,28 +1,13 @@
 package cn.ycl.study.annotation;
 
+import cn.ycl.study.annotation.bean.ComponentBean;
+import cn.ycl.study.annotation.bean.ConfigurationBean;
 import cn.ycl.study.annotation.comonentscanfilter.ConfigApp;
 import cn.ycl.study.annotation.comonentscanfilter.ExcludeBean;
 import cn.ycl.study.annotation.qulifier.QulifierTest;
-import cn.ycl.study.ioc.bean.Config;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.*;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.io.ProtocolResolver;
-import org.springframework.core.io.Resource;
-
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.Locale;
-import java.util.Map;
 
 public class Main {
     public void testAnnotation( ApplicationContext getContext ){
@@ -65,9 +50,34 @@ public class Main {
         System.out.println("结束");
     }
 
+    public void testBean(){
+        ApplicationContext context = getContext();
+
+        //测试Component和Configuration中注册bean的区别
+        Person person1 = (Person) context.getBean("configurationPeron");
+        Person person11 = (Person) context.getBean("configurationPeron");
+        System.out.println("@Configuration中注册的bean:" + (person1 == person11));
+
+        Person person2 = (Person) context.getBean("componentPeron");
+        Person person22 = (Person) context.getBean("componentPeron");
+        System.out.println("@Component中注册的bean:" + (person2 == person22));
+
+        //测试调用方法的区别
+
+        ConfigurationBean configurationBean = context.getBean(ConfigurationBean.class);
+        Person person4 = configurationBean.getPersion();
+        Person person44 = configurationBean.getPersion();
+        System.out.println("@Configuration调用方法的区别：" + (person4 == person44));
+
+        ComponentBean componentBean = context.getBean(ComponentBean.class);
+        Person person3 = componentBean.getPersion();
+        Person person33 = componentBean.getPersion();
+        System.out.println("@Component中调用方法的区别：" + (person3 == person33));
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
-        main.componentScanTest();
+        main.testBean();
 
     }
 

@@ -23,6 +23,7 @@ public class AutowiredBean {
         this.desc = desc;
     }
 
+
     /**
      * 注入到构造函数的参数中
      * @param bean

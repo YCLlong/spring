@@ -593,7 +593,69 @@ component 英文是组件的意思，它是Spring管理的组件通用构造类�
     
     因为过滤中通过我们自己的过滤逻辑匹配到返回了true，所以这个ExcludeBean就不会被扫描到，ioc容器中没有它的信息就会报错啦。
     
+
+# @Bean
+这个注解和\<bean>标签是一样的功能，在ioc容器中注册一个bean.
+
+## 在Component 中注册bean和在Configuration中注册bean的区别
+
+@Component 中使用@Bean注册bean
+
+    @Component
+    public class ComponentBean {
+        @Bean("componentPeron")
+        public Person getPersion(){
+            return new Person("在component中注册的bean",0);
+        }
+    }
+@Configuration中使用@Bean注册bean
+
+    @Configuration
+    public class ConfigurationBean {
+        @Bean("configurationPeron")
+        public Person getPersion(){
+            return new Person("在configuration中注册bean",1);
+        }
+    }
+
+测试区别
+
+        public void testBean(){
+            ApplicationContext context = getContext();
     
+            //测试Component和Configuration中注册bean的区别
+            Person person1 = (Person) context.getBean("configurationPeron");
+            Person person11 = (Person) context.getBean("configurationPeron");
+            System.out.println("@Configuration中注册的bean:" + (person1 == person11));
     
+            Person person2 = (Person) context.getBean("componentPeron");
+            Person person22 = (Person) context.getBean("componentPeron");
+            System.out.println("@Component中注册的bean:" + (person2 == person22));
+    
+            //测试调用方法的区别
+            ConfigurationBean configurationBean = context.getBean(ConfigurationBean.class);
+            Person person4 = configurationBean.getPersion();
+            Person person44 = configurationBean.getPersion();
+            System.out.println("@Configuration调用方法的区别：" + (person4 == person44));
+    
+            ComponentBean componentBean = context.getBean(ComponentBean.class);
+            Person person3 = componentBean.getPersion();
+            Person person33 = componentBean.getPersion();
+            System.out.println("@Component中调用方法的区别：" + (person3 == person33));
+        }
+运行结果
+
+    @Configuration中注册的bean:true
+    @Component中注册的bean:true
+    @Configuration调用方法的区别：true
+    @Component中调用方法的区别：false
+        
+### 结论
+作为bean的注册或者是依赖注入的功能来讲，在Component中注册bean和在Configuration中注册bean效果是完全一样的。
+但是在方法调用上是有区别的，我们通过测试的例子就能发现，当我们调用 **@Component**  注解的类中的方法时，返回的Person对象是不一样的，说明**是按照普通的方法调用**
+，而使用 **@Configuration注解的类**调用getPersion方法时，生成的对象完全一样，那么就 **不是按照普通的方法调用**了。
+
+### 原理
+@Configuration标注下的@Bean调用函数使用都是代理对象，获取的都是从IOC容器里获取的bean，因此都是同一个。而@Component标注下的@Bean下只是普通的函数方法调用。下面来看一下@configuration注册@Bean生成代理的过程。
     
     
