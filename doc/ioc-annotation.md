@@ -659,3 +659,50 @@ component 英文是组件的意思，它是Spring管理的组件通用构造类�
 @Configuration标注下的@Bean调用函数使用都是代理对象，获取的都是从IOC容器里获取的bean，因此都是同一个。而@Component标注下的@Bean下只是普通的函数方法调用。下面来看一下@configuration注册@Bean生成代理的过程。
     
     
+ ## 使用扫描注解时，bean的命名
+    
+@CompmentSscan会扫描指定包下所有@Compment注解的类，然后会将其加入到ioc容器中。那这些通过扫描加入ioc容器的bean的名称是如果确定的呢？
+
+>这些bean的名称由Spring提供的bean命名策略生成，我们可以自定义bean的生成策略，实现 BeanNameGenerator接口，然后在 @ComponentScan注解的nameGenerator 属性中指定我们自定义的策略的class
+
+    @Configuration
+    @ComponentScan(basePackages = "org.example", nameGenerator = MyNameGenerator.class)
+    public class AppConfig {
+    }
+ 
+那么自定义的bean名字生成策略又是什么了？
+> @Component，@Service，@Repository,@Controller等注解有value，这个value当我们指定时就是用这个value作为bean的标识，否则使用是类的名称（第一个字母小写）作为bean的名称。
+
+> @Bean注解类似，提供了名称属性，如果不定义就会使用方法名作为bean的名称。
+
+## 使用扫描注解时，bean的范围
+> 要为范围解析提供自定义策略而不是依赖基于注释的方法，您可以实现该 ScopeMetadataResolver 接口。请确保包含默认的无参数构造函数。然后，您可以在配置扫描程序时提供完全限定的类名，因为以下注释和bean定义示例显示
+    
+    @Configuration
+    @ComponentScan(basePackages = "org.example", scopeResolver = MyScopeResolver.class)
+    public class AppConfig {
+    }
+## 生成候选组件索引
+虽然类路径扫描速度非常快，但可以通过在编译时创建候选的静态列表来提高大型应用程序的启动性能。在此模式下，所有作为组件扫描目标的模块都必须使用此机制。
+
+使用方法很简单，引入相关的依赖就行了。
+
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context-indexer</artifactId>
+        <version>5.1.9.RELEASE</version>
+        <optional>true</optional>
+    </dependency>
+   
+# JSR303标准注释的支持
+从Spring 3.0开始，Spring提供对JSR-330标准注释（依赖注入）的支持。这些注释的扫描方式与Spring注释相同。要使用它们，您需要在类路径中包含相关的jar。
+    
+    <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+    </dependency>
+    
+个人感觉不会用到，如果用到可以去官网查询详细用法
+
+

@@ -1,4 +1,4 @@
-package cn.ycl.study.ioc.methoddi;
+package cn.ycl.study.ioc.xml.methoddi;
 
 public abstract class BeanA{
     private String desc;

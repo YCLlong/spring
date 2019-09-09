@@ -1,9 +1,11 @@
-package cn.ycl.study.ioc;
+package cn.ycl.study.ioc.xml;
 
-import cn.ycl.study.ioc.bean.*;
-import cn.ycl.study.ioc.expond.TestLifeInterfaceBean;
-import cn.ycl.study.ioc.methoddi.BeanA;
-import cn.ycl.study.ioc.methoddi.BeanB;
+import cn.ycl.study.ioc.xml.bean.AutowireConfig;
+import cn.ycl.study.ioc.xml.bean.BeanLife;
+import cn.ycl.study.ioc.xml.bean.Config;
+import cn.ycl.study.ioc.xml.bean.ValueConfig;
+import cn.ycl.study.ioc.xml.methoddi.BeanA;
+import cn.ycl.study.ioc.xml.methoddi.BeanB;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -17,7 +19,7 @@ public class Main {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:sping-context.xml");
         /**
          * 2，通过ioc容器对象创建Bean对象。前提是，在元数据中，已经配置了bean信息
-         *    <bean id="helloIOC" class="cn.ycl.study.ioc.HelloIOC"></bean>
+         *    <bean id="helloIOC" class="cn.ycl.study.ioc.xml.HelloIOC"></bean>
          */
         HelloIOC helloIOC = context.getBean(HelloIOC.class);
         helloIOC.hello();
@@ -132,12 +134,12 @@ public class Main {
      */
     public void expondLifeInterface(){
         ApplicationContext context = getContrext();
-        TestLifeInterfaceBean bean = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        cn.ycl.study.ioc.expond.TestLifeInterfaceBean bean = (cn.ycl.study.ioc.expond.TestLifeInterfaceBean) context.getBean("expondLifeInterface");
         //按照猜想，得到单例的bean后，将它指向null。后面从容器获取这个bean时理论上是Null。但是结果是配置数据装配后的bean
         bean = null;
         System.gc();
-        TestLifeInterfaceBean bean1 = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
-        TestLifeInterfaceBean bean2 = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        cn.ycl.study.ioc.expond.TestLifeInterfaceBean bean1 = (cn.ycl.study.ioc.expond.TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        cn.ycl.study.ioc.expond.TestLifeInterfaceBean bean2 = (cn.ycl.study.ioc.expond.TestLifeInterfaceBean) context.getBean("expondLifeInterface");
         System.out.println(bean1 == bean2);//结果返回true
         try {
             Thread.sleep(30000);
@@ -154,12 +156,12 @@ public class Main {
 
     public void beanNameAware(){
         ApplicationContext context = getContrext();
-        BeanNameAwareTest lifecycle = context.getBean(BeanNameAwareTest.class);
+        cn.ycl.study.ioc.bean.BeanNameAwareTest lifecycle = context.getBean(cn.ycl.study.ioc.bean.BeanNameAwareTest.class);
     }
 
     public void registerBeanTest(){
         ApplicationContext context = getContrext();
-        context.getBean(RegisterBean.class);
+        context.getBean(cn.ycl.study.ioc.bean.RegisterBean.class);
     }
 
    public static void main(String[] args) {

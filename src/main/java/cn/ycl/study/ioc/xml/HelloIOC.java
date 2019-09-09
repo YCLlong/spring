@@ -1,4 +1,4 @@
-package cn.ycl.study.ioc;
+package cn.ycl.study.ioc.xml;
 
 public class HelloIOC {
     private String desc;

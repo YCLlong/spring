@@ -1,6 +1,6 @@
-package cn.ycl.study.ioc.bean;
+package cn.ycl.study.ioc.xml.bean;
 
-import cn.ycl.study.ioc.HelloIOC;
+import cn.ycl.study.ioc.xml.HelloIOC;
 
 public class Config {
     private String name;

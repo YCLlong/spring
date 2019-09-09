@@ -1,6 +1,6 @@
-package cn.ycl.study.annotation;
+package cn.ycl.study.ioc.annotation;
 
-import cn.ycl.study.annotation.comonentscanfilter.MyScanFilter;
+import cn.ycl.study.ioc.annotation.comonentscanfilter.MyScanFilter;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Component;
 

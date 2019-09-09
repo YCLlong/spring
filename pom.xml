@@ -15,6 +15,21 @@
             <artifactId>spring-context</artifactId>
             <version>5.1.9.RELEASE</version>
         </dependency>
+
+        <!--引入包扫描索引-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-indexer</artifactId>
+            <version>5.1.9.RELEASE</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!--spring-web 是spring提供了web相关技术的集成，Spring-webmvc依赖于spring-web.如果我们并不想使用spring nvc只要引入spring-web即可。当我们引入spring-webmvc时就引入了spring-web-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.1.9.RELEASE</version>
+        </dependency>
     </dependencies>
 
 

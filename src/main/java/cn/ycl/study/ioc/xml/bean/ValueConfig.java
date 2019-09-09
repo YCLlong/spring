@@ -1,4 +1,4 @@
-package cn.ycl.study.ioc.bean;
+package cn.ycl.study.ioc.xml.bean;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package cn.ycl.study.ioc.scope;
+package cn.ycl.study.ioc.xml.scope;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;

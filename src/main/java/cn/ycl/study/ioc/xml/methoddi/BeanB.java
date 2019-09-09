@@ -1,4 +1,4 @@
-package cn.ycl.study.ioc.methoddi;
+package cn.ycl.study.ioc.xml.methoddi;
 
 public class BeanB {
     private String desc;

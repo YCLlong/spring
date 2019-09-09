@@ -1,4 +1,4 @@
-package cn.ycl.study.ioc.methoddi;
+package cn.ycl.study.ioc.xml.methoddi;
 
 import org.springframework.beans.factory.support.MethodReplacer;
 
