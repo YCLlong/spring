@@ -92,3 +92,195 @@ web.xml中配置
 但是对于spring提供的这个配置，有部分还没有理解。
 
 > 在/<context-param>标签中指定了属性contextConfigLocation为一个java配置类，但是在/<servlet>标签中的/<init-param>标签中需要再次配置contextConfigLocation
+
+
+# @Bean和@Configuration注解的使用
+java配置的方式这两个注解非常的常用。@Bean是方法级别的注释，它注释的方法返回的对象会被注册到IOC容器中去，@Configuration注解用在类的级别上，被注册的类表示是一个配置类。@Confifuration注解行有@Component注解，会被扫描到。
+一般@Bean注解的方法都是在用@Configuration注解的类中或者@COmpoment注解的类中，才能被识别成Bean.
+> 用@COmponent或者@Configuration注解的类中的Bean在构建初始化，di时都完全一致，区别在于通过类对象直接执行对象中的方法会不同。@
+> @Configuration注解的类对象调用方法时会有一些处理，这个对象是代理对象，在代理的时候就加入特殊处理了。
+
+# @Import
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface Import {
+    
+        /**
+         * {@link Configuration}, {@link ImportSelector}, {@link ImportBeanDefinitionRegistrar}
+         * or regular component classes to import.
+         */
+        Class<?>[] value();
+    
+    }
+
+它的功能是导入某个配置类，有点像/<import />标签
+
+# @ImportResource
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    @Documented
+    public @interface ImportResource {
+
+        /**
+         * Alias for {@link #locations}.
+         * @see #locations
+         * @see #reader
+         */
+        @AliasFor("locations")
+        String[] value() default {};
+    
+        /**
+         * Resource locations from which to import.
+         * <p>Supports resource-loading prefixes such as {@code classpath:},
+         * {@code file:}, etc.
+         * <p>Consult the Javadoc for {@link #reader} for details on how resources
+         * will be processed.
+         * @since 4.2
+         * @see #value
+         * @see #reader
+         */
+        @AliasFor("value")
+        String[] locations() default {};
+    
+        /**
+         * {@link BeanDefinitionReader} implementation to use when processing
+         * resources specified via the {@link #value} attribute.
+         * <p>By default, the reader will be adapted to the resource path specified:
+         * {@code ".groovy"} files will be processed with a
+         * {@link org.springframework.beans.factory.groovy.GroovyBeanDefinitionReader GroovyBeanDefinitionReader};
+         * whereas, all other resources will be processed with an
+         * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader XmlBeanDefinitionReader}.
+         * @see #value
+         */
+        Class<? extends BeanDefinitionReader> reader() default BeanDefinitionReader.class;
+    }
+
+**当我们使用主要使用java配置时，可能也需要使用xml配置文件**，这样的话就可以使用@ImportResource注解了。
+该注解的值是配置文件路径。配置文件的内容可以是bean的描述，也可以是属性的描述，总之都会加入ioc容器。例如
+**如果我们主要使用的是配置文件时，却想混合使用java配置** 可以用
+<context:component-scan base-package="com.acme"/>
+
+
+    jdbc.properties
+    jdbc.url = JDBC：HSQLDB：HSQL：//本地主机/ XDB
+    jdbc.username = SA
+    jdbc.password =
+    
+    properties-config.xml
+    <beans>
+        <context:property-placeholder location="classpath:/com/acme/jdbc.properties"/>
+    </beans>
+    
+    @Configuration
+    @ImportResource("classpath:/com/acme/properties-config.xml")
+    public class AppConfig {
+    
+        @Value("${jdbc.url}")
+        private String url;
+    
+        @Value("${jdbc.username}")
+        private String username;
+            @Value("${jdbc.password}")
+        private String password;
+    
+        @Bean
+        public DataSource dataSource() {
+            return new DriverManagerDataSource(url, username, password);
+        }
+    }
+    
+# @Profile
+
+    @Target({ElementType.TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @Conditional(ProfileCondition.class)
+    public @interface Profile {
+    
+        /**
+         * The set of profiles for which the annotated component should be registered.
+         */
+        String[] value();
+    
+    }
+
+当我们在不同的环境需要进行不同的配置是，可以用到这个注解。比如我想组件想只在product环境中注册
+   
+    @Component
+    @Profile("product")
+    public class Comm{
+    
+    }
+    
+
+    
+## Profile的逻辑表达式
+    
+    !：配置文件的逻辑“不”
+    &：配置文件的逻辑“和”
+    |：配置文件的逻辑“或”
+    
+    @Component
+    //不是 product 环境中才装配
+    @Profile("!product")
+    public class Comm{
+    
+    }
+
+# @Conditional
+
+    @Target({ElementType.TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface Conditional {
+    
+        /**
+         * All {@link Condition Conditions} that must {@linkplain Condition#matches match}
+         * in order for the component to be registered.
+         */
+        Class<? extends Condition>[] value();
+    
+    }
+    
+    @FunctionalInterface
+    public interface Condition {
+    
+        /**
+         * Determine if the condition matches.
+         * @param context the condition context
+         * @param metadata metadata of the {@link org.springframework.core.type.AnnotationMetadata class}
+         * or {@link org.springframework.core.type.MethodMetadata method} being checked
+         * @return {@code true} if the condition matches and the component can be registered,
+         * or {@code false} to veto the annotated component's registration
+         */
+        boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata);
+    
+    }
+
+    
+更加灵活的条件配置，在SpringBoot中，实现了很多Condition接口，以及提供了对应的注解。
+这些扩展的注解都是基于@Conditional这个元注解的。
+
+比如@Profile，我们就发现这个注解上有     @Conditional(ProfileCondition.class)
+
+    class ProfileCondition implements Condition {
+        @Override
+        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+            MultiValueMap<String, Object> attrs = metadata.getAllAnnotationAttributes(Profile.class.getName());
+            if (attrs != null) {
+                for (Object value : attrs.get("value")) {
+                    if (context.getEnvironment().acceptsProfiles(Profiles.of((String[]) value))) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
+所以当我们想实现自定义的条件注解时，先实现Condition接口的matches方法的自定义（比如类的民资叫A），然后在我们自定义注解上加上
+@Conditional(A.class)
