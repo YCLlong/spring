@@ -230,6 +230,19 @@ java配置的方式这两个注解非常的常用。@Bean是方法级别的注�
     
     }
 
+## 激活Profile
+在SPringBoot中，可以通过spring. profiles.active
+属性就可以指定。那么在Spring中如何指定呢？
+
+    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+    ctx.getEnvironment().setActiveProfiles("development");
+    ctx.register(SomeConfig.class, StandaloneDataConfig.class, JndiDataConfig.class);
+    ctx.refresh();
+
+可以通过环境对象，设置activeProfile.其实SpringBoot
+中的配置会被读取到环境变量中，然后接下来的过程和上述的代码差不多，去设置Profile
+
+
 # @Conditional
 
     @Target({ElementType.TYPE, ElementType.METHOD})
@@ -284,3 +297,36 @@ java配置的方式这两个注解非常的常用。@Bean是方法级别的注�
 
 所以当我们想实现自定义的条件注解时，先实现Condition接口的matches方法的自定义（比如类的民资叫A），然后在我们自定义注解上加上
 @Conditional(A.class)
+
+# Environment
+这个是一个接口，它抽象了环境，简单的说。我们定义的很多配置，或者是Spring默认的一些配置，还有系统的一些属性配置，通过这个对象都能找得到。
+
+获取Environment对象的方式很多
+    
+    1.通过IOC容器对象获得，ApplicationContext#getEnviroment
+    2.实现EnvironmentAware接口
+    3.通过@Autowired注解直接注入
+    
+    
+    AnnotationConfigApplicationContext context = getAnnotationContext();
+    Environment environment = context.getEnvironment();
+    MutablePropertySources resource = ((ConfigurableEnvironment) environment).getPropertySources();
+    Map<String, Object> sysEnviroment = ((ConfigurableEnvironment) environment).getSystemEnvironment();
+    Map<String, Object> sysProperties = ((ConfigurableEnvironment) environment).getSystemProperties();
+    System.out.println("end");
+    
+# 加载properties配置文件
+
+在定义bean的xml配置文件中，我们如果想加入别的配置，可以使用/<import>注解。但是有很多这样的场景，我们需要加载自定义的一些配置信息
+比如jdbc.properties。
+> 在xml配置文件中可以使用/<context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
+
+> 在java配置类中，可以使用
+
+    @PropertySource(value = {"classpath:person.properties"})//加载person.properties配置文件
+    @Component
+    @ConfigurationProperties(prefix = "person")
+    //@Validated
+    
+    public  class Person {
+    }

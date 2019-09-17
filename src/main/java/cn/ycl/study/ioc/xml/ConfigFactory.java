@@ -1,6 +1,5 @@
 package cn.ycl.study.ioc.xml;
 
-import cn.ycl.study.ioc.bean.Config;
 import cn.ycl.study.ioc.xml.bean.Config;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;

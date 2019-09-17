@@ -1,4 +1,4 @@
-package cn.ycl.study.annotation;
+package cn.ycl.study.ioc.annotation;
 
 import org.springframework.stereotype.Component;
 

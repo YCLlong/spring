@@ -1,5 +1,4 @@
-package cn.ycl.study.ioc.expond;
-
+package cn.ycl.study.ioc.xml.expond;
 
 public class TestLifeInterfaceBean{
     private String desc;

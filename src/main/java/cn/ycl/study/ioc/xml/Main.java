@@ -1,9 +1,7 @@
 package cn.ycl.study.ioc.xml;
 
-import cn.ycl.study.ioc.xml.bean.AutowireConfig;
-import cn.ycl.study.ioc.xml.bean.BeanLife;
-import cn.ycl.study.ioc.xml.bean.Config;
-import cn.ycl.study.ioc.xml.bean.ValueConfig;
+import cn.ycl.study.ioc.xml.bean.*;
+import cn.ycl.study.ioc.xml.expond.TestLifeInterfaceBean;
 import cn.ycl.study.ioc.xml.methoddi.BeanA;
 import cn.ycl.study.ioc.xml.methoddi.BeanB;
 import org.springframework.context.ApplicationContext;
@@ -134,12 +132,12 @@ public class Main {
      */
     public void expondLifeInterface(){
         ApplicationContext context = getContrext();
-        cn.ycl.study.ioc.expond.TestLifeInterfaceBean bean = (cn.ycl.study.ioc.expond.TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        TestLifeInterfaceBean bean = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
         //按照猜想，得到单例的bean后，将它指向null。后面从容器获取这个bean时理论上是Null。但是结果是配置数据装配后的bean
         bean = null;
         System.gc();
-        cn.ycl.study.ioc.expond.TestLifeInterfaceBean bean1 = (cn.ycl.study.ioc.expond.TestLifeInterfaceBean) context.getBean("expondLifeInterface");
-        cn.ycl.study.ioc.expond.TestLifeInterfaceBean bean2 = (cn.ycl.study.ioc.expond.TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        TestLifeInterfaceBean bean1 = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
+        TestLifeInterfaceBean bean2 = (TestLifeInterfaceBean) context.getBean("expondLifeInterface");
         System.out.println(bean1 == bean2);//结果返回true
         try {
             Thread.sleep(30000);
@@ -156,12 +154,12 @@ public class Main {
 
     public void beanNameAware(){
         ApplicationContext context = getContrext();
-        cn.ycl.study.ioc.bean.BeanNameAwareTest lifecycle = context.getBean(cn.ycl.study.ioc.bean.BeanNameAwareTest.class);
+       BeanNameAwareTest lifecycle = context.getBean(BeanNameAwareTest.class);
     }
 
     public void registerBeanTest(){
         ApplicationContext context = getContrext();
-        context.getBean(cn.ycl.study.ioc.bean.RegisterBean.class);
+        context.getBean(RegisterBean.class);
     }
 
    public static void main(String[] args) {

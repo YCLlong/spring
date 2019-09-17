@@ -11,47 +11,47 @@
 
     <alias name="h1" alias="h2"></alias>
     <alias name="h1" alias="h3"></alias>
-    <bean id="helloIOC" name="h1,h11"  class="cn.ycl.study.ioc.HelloIOC">
+    <bean id="helloIOC" name="h1,h11"  class="cn.ycl.study.ioc.xml.HelloIOC">
         <constructor-arg name="desc" value="123构造函数注入"></constructor-arg>
     </bean>
 
     <!--构造函数创建对象-->
-    <bean id="config1" name="config1" class="cn.ycl.study.ioc.bean.Config"></bean>
+    <bean id="config1" name="config1" class="cn.ycl.study.ioc.xml.bean.Config"></bean>
 
     <!--静态工厂方法创建对象-->
-    <bean id="config2" name="config2" class="cn.ycl.study.ioc.ConfigFactory" factory-method="createConfig"></bean>
+    <bean id="config2" name="config2" class="cn.ycl.study.ioc.xml.ConfigFactory" factory-method="createConfig"></bean>
 
     <!--实例工厂方法创建对象-->
-    <bean id="factory" class="cn.ycl.study.ioc.ConfigFactory"></bean>
+    <bean id="factory" class="cn.ycl.study.ioc.xml.ConfigFactory"></bean>
     <bean id="config3" name="config3" factory-bean="factory" factory-method="createConfigInstance"></bean>
 
     <!--构造函数属性注入。通过bean标签内的constructor-arg 标签指定。注意其中index从0开始-->
-    <bean id="config4" name="config4" class="cn.ycl.study.ioc.bean.Config">
+    <bean id="config4" name="config4" class="cn.ycl.study.ioc.xml.bean.Config">
         <constructor-arg name="name" type="java.lang.String" value="构造函数注入"></constructor-arg>
         <constructor-arg index="1" ref="h1"></constructor-arg>
         <constructor-arg name="version" value="2"></constructor-arg>
     </bean>
 
     <!--setter注入，要求bean需要提供属性的set方法，且修饰符是public，否则的就会报错-->
-    <bean id="config5" name="config5" class="cn.ycl.study.ioc.bean.Config">
+    <bean id="config5" name="config5" class="cn.ycl.study.ioc.xml.bean.Config">
         <property name="name" value="setter注入"></property>
         <property name="ioc" ref="h1"></property>
         <property name="version" value="12"></property>
     </bean>
 
     <!--p命名空间-->
-    <bean id="config6" name="config6" class="cn.ycl.study.ioc.bean.Config"
+    <bean id="config6" name="config6" class="cn.ycl.study.ioc.xml.bean.Config"
           p:name="p命名空间"
           p:ioc-ref="h2"
           p:version="10086"
     />
 
-    <bean id="config7" name="config7" class="cn.ycl.study.ioc.bean.Config">
+    <bean id="config7" name="config7" class="cn.ycl.study.ioc.xml.bean.Config">
         <constructor-arg name="name">
             <idref bean="helloIOC"></idref>
         </constructor-arg>
         <constructor-arg name="ioc">
-            <bean class="cn.ycl.study.ioc.HelloIOC">
+            <bean class="cn.ycl.study.ioc.xml.HelloIOC">
                 <constructor-arg name="desc" value="内部bean"></constructor-arg>
             </bean>
         </constructor-arg>
@@ -59,18 +59,18 @@
     </bean>
 
     <!--复杂属性的注入-->
-    <bean id="config8" name="config8" class="cn.ycl.study.ioc.bean.ValueConfig">
+    <bean id="config8" name="config8" class="cn.ycl.study.ioc.xml.bean.ValueConfig">
         <property name="configArray">
             <!--对象数组注入-->
             <array>
-                <bean class="cn.ycl.study.ioc.bean.Config">
+                <bean class="cn.ycl.study.ioc.xml.bean.Config">
                     <property name="name" value="configArray1"></property>
                     <property name="ioc">
                         <null></null>
                     </property>
                 </bean>
 
-                <bean class="cn.ycl.study.ioc.bean.Config">
+                <bean class="cn.ycl.study.ioc.xml.bean.Config">
                     <property name="name" value="configArray2"></property>
                     <property name="ioc" ref="h3"></property>
                 </bean>
@@ -88,13 +88,13 @@
         <property name="configList">
             <!--对象List注入-->
             <list>
-                <bean class="cn.ycl.study.ioc.bean.Config">
+                <bean class="cn.ycl.study.ioc.xml.bean.Config">
                     <property name="name" value="configList1"></property>
                     <property name="ioc">
                         <null></null>
                     </property>
                 </bean>
-                <bean class="cn.ycl.study.ioc.bean.Config">
+                <bean class="cn.ycl.study.ioc.xml.bean.Config">
                     <property name="name" value="configList2"></property>
                 </bean>
             </list>
@@ -149,38 +149,38 @@
     </bean>
 
     <!--自动装配-->
-    <bean id="vlueConfig"  class="cn.ycl.study.ioc.HelloIOC">
+    <bean id="vlueConfig"  class="cn.ycl.study.ioc.xml.HelloIOC">
         <constructor-arg name="desc" value="自动装配"></constructor-arg>
     </bean>
-    <bean name="config9" autowire="no" class="cn.ycl.study.ioc.bean.AutowireConfig"/>
+    <bean name="config9" autowire="no" class="cn.ycl.study.ioc.xml.bean.AutowireConfig"/>
 
     <!--方法注入 lookup-method-->
-    <bean name="beanB" class="cn.ycl.study.ioc.methoddi.BeanB" scope="prototype"></bean>
-    <bean name="beanA" class="cn.ycl.study.ioc.methoddi.BeanA">
+    <bean name="beanB" class="cn.ycl.study.ioc.xml.methoddi.BeanB" scope="prototype"></bean>
+    <bean name="beanA" class="cn.ycl.study.ioc.xml.methoddi.BeanA">
         <lookup-method name="getBeanB" bean="beanB"></lookup-method>
     </bean>
 
     <!--方法注入 replace-method-->
-    <bean name="replaceBeanA" class="cn.ycl.study.ioc.methoddi.ReplaceBeanA"/>
-    <bean name="replaceBeanB" class="cn.ycl.study.ioc.methoddi.BeanB">
+    <bean name="replaceBeanA" class="cn.ycl.study.ioc.xml.methoddi.ReplaceBeanA"/>
+    <bean name="replaceBeanB" class="cn.ycl.study.ioc.xml.methoddi.BeanB">
         <property name="desc" value="replace-method测试，没有替换之前的初始值"/>
         <!--替换BeanB中的 getDesc 方法，使用替换对象 replaceBeanA-->
         <replaced-method  name="getDesc" replacer="replaceBeanA"/>
     </bean>
 
     <!--生命周期-->
-    <bean name="config10" class="cn.ycl.study.ioc.bean.Config" scope="prototype"/>
+    <bean name="config10" class="cn.ycl.study.ioc.xml.bean.Config" scope="prototype"/>
 
     <!--bean的扩展点-->
-    <bean name="expondLifeInterface" class="cn.ycl.study.ioc.expond.TestLifeInterfaceBean" init-method="afterPropertiesSet" destroy-method="destroy"/>
+    <bean name="expondLifeInterface" class="cn.ycl.study.ioc.xml.expond.TestLifeInterfaceBean" init-method="afterPropertiesSet" destroy-method="destroy"/>
 
     <!--默认的初始化和销毁方法回调-->
-    <bean name="life" class="cn.ycl.study.ioc.bean.BeanLife"/>
+    <bean name="life" class="cn.ycl.study.ioc.xml.bean.BeanLife"/>
 
     <!--BeanNameAware接口测试-->
-    <bean name="beanNameWare" class="cn.ycl.study.ioc.bean.BeanNameAwareTest"/>
+    <bean name="beanNameWare" class="cn.ycl.study.ioc.xml.bean.BeanNameAwareTest"/>
 
     <!--这个bean实现了特定的接口，可以得到 BeanDefinitionRegistry对象，通过这个对象可以动态的像容器注册bean-->
-    <bean name="registerBean" class="cn.ycl.study.ioc.bean.RegisterBean"/>
+    <bean name="registerBean" class="cn.ycl.study.ioc.xml.bean.RegisterBean"/>
 
 </beans>

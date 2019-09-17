@@ -4,17 +4,18 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
+    <context:property-placeholder location=""></context:property-placeholder>
     <!--自定义限定符-->
-    <bean name="qulifierSelf" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+    <bean name="qulifierSelf" class="cn.ycl.study.ioc.annotation.qulifier.SelfQulifier">
         <!--加上了限定符，如果项目中有限定符的使用，这个信息就会起到匹配的作用，否则毫无用处-->
-        <qualifier type="cn.ycl.study.annotation.qulifier.Offline">
+        <qualifier type="cn.ycl.study.ioc.annotation.qulifier.Offline">
             <attribute key="name" value="test"></attribute>
             <attribute key="level" value="1"></attribute>
         </qualifier>
         <property name="desc" value="龙哥"/>
     </bean>
 
-    <bean name="qulifierTest" class="cn.ycl.study.annotation.qulifier.SelfQulifier">
+    <bean name="qulifierTest" class="cn.ycl.study.ioc.annotation.qulifier.SelfQulifier">
         <meta key="name" value="test"/>
         <meta key="level" value="0"/>
         <property name="desc" value="焦妹"/>

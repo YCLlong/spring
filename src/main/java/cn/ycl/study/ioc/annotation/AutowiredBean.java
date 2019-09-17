@@ -18,7 +18,7 @@ public class AutowiredBean {
     private ApplicationContext context;
 
    // @Autowired() 这样会报错，因为desc
-    public AutowiredBean(XmlToAnnotationBean bean,String desc){
+    public AutowiredBean(XmlToAnnotationBean bean, String desc){
         this.bean = bean;
         this.desc = desc;
     }
@@ -61,7 +61,7 @@ public class AutowiredBean {
      * @param bean
      * @param desc
      */
-    public void diParam(@Autowired XmlToAnnotationBean bean,String desc){
+    public void diParam(@Autowired XmlToAnnotationBean bean, String desc){
         System.out.println(bean.getClass());
     }
 }

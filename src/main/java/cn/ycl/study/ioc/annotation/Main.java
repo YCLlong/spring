@@ -11,7 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
     public void testAnnotation( ApplicationContext getContext ){
-        cn.ycl.study.annotation.XmlToAnnotationBean bean = getContext.getBean(cn.ycl.study.annotation.XmlToAnnotationBean.class);
+        XmlToAnnotationBean bean = getContext.getBean(XmlToAnnotationBean.class);
         bean.show();
     }
 

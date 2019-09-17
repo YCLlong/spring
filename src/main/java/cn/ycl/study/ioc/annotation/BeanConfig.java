@@ -22,8 +22,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public cn.ycl.study.annotation.PrimaryTest primaryTest(){
-        return new cn.ycl.study.annotation.PrimaryTest();
+    public PrimaryTest primaryTest(){
+        return new PrimaryTest();
     }
 
     @Bean
