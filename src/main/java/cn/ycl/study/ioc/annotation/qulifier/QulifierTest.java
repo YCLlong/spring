@@ -1,4 +1,4 @@
-package cn.ycl.study.annotation.qulifier;
+package cn.ycl.study.ioc.annotation.qulifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

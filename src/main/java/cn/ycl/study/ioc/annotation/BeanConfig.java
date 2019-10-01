@@ -1,5 +1,6 @@
 package cn.ycl.study.ioc.annotation;
 
+import cn.ycl.study.ioc.annotation.qulifier.QulifierTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfig {
 
     @Bean
-    public cn.ycl.study.annotation.qulifier.QulifierTest q1(){
-        return new cn.ycl.study.annotation.qulifier.QulifierTest();
+    public QulifierTest q1(){
+        return new QulifierTest();
     }
 
     @Bean
