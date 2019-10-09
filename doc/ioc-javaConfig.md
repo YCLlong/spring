@@ -443,7 +443,28 @@ xml配置
     
     Spring国际化提供了参数的功能，当然也可以不使用参数
     
-    
+# BeanFactory和ApplicationContext
+
+BeanFactory接口提供了许多获取Bean实例和Bean相关信息的方法。
+ApplicationContext 接口继承了 ListableBeanFactory接口，而ListableBeanFactory接口继承了BeanFactory接口
+
+
+
+
+
+
+特征|BeanFactory|ApplicationContext
+:---:| :- | ---:
+Bean实例化 |Y| Y
+集成生命周期管理 |N| Y
+自动BeanPostProcessor注册 |N| Y
+自动BeanFactoryPostProcessor注册 |N| Y
+MessageSource国际化 |N| Y
+内置ApplicationEvent发布机制 |N| Y
+
+
+
+ 
     
 
 
