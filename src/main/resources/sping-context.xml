@@ -183,4 +183,14 @@
     <!--这个bean实现了特定的接口，可以得到 BeanDefinitionRegistry对象，通过这个对象可以动态的像容器注册bean-->
     <bean name="registerBean" class="cn.ycl.study.ioc.xml.bean.RegisterBean"/>
 
+    <bean id="messageSource"
+          class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>base</value>
+                <value>windows</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
