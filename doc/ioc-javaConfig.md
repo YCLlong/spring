@@ -393,6 +393,57 @@ Locale指定了当前是什么区域
 ResourceBundle bundle = ResourceBundle.getBundle("base", locale); 找到指定的配置文件对象，
 String msg = bundle.getString("msg");然后读取配置文件中的配置项目，比如读取到了msg
 
+## Spring国际化
+Spring国际化需要实例化bean **ResourceBundleMessageSource** 然后注入属性 **baseNames** 是一个list
+配置文件也是放在classPath下，一般放在 resource中，命名规则和java的国际化一样。
 
+xml配置
+    
+    <beans>
+        <bean id="messageSource"
+                class="org.springframework.context.support.ResourceBundleMessageSource">
+            <property name="basenames">
+                <list>
+                    <value>base</value>
+                    <value>windows</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
+    
+    
+调用
+
+    public class XmlI18n {
+        public static void main(String[] args) {
+            MessageSource messageSource = getMessageSource();
+            String msgUs = messageSource.getMessage("tip",new Object[]{"name","code"}, Locale.US);
+            System.out.println(msgUs);
+            String msgChina = messageSource.getMessage("tip",new Object[]{"姓名","编号"}, Locale.CHINA);
+            System.out.println(msgChina);
+        }
+    
+        public static MessageSource getMessageSource(){
+            MessageSource source = new ClassPathXmlApplicationContext("classpath:sping-context.xml");
+            return source;
+        }
+    }
+    
+配置文件
+    
+    和java国际化配置名字一样
+    
+    msg=I love china
+    tip=The arguments {0} is required。 {1} is not necessary.
+    
+    msg=我爱中国
+    tip=参数 {0} 必须存在,{1}可以不存在
+
+其他
+    
+    Spring国际化提供了参数的功能，当然也可以不使用参数
+    
+    
+    
 
 
