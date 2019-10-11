@@ -40,7 +40,10 @@ ValidationUtils 是一个校验工具类，可以研究一下
 # 属性绑定
 SpringMVC中，可以直接将表单中的数据封账到java对象中，免去了我们从request中获取参数，然后set到对象中的步骤，非常方便
 
-## BeanWrapper
+## BeanWrapper接口
+
+使用反射技术可以很好的做到这点，Spring提供了BeanWrapper接口和实现类BeanWrapperImpl。我们通过BeanWrapperImpl对象可以非常的方便操作对象的属性。
+而且没有属性嵌套的深度的限制
 
     public static void main(String[] args) {
         BeanWrapper classWrapper = new BeanWrapperImpl(new MyClass());
@@ -52,3 +55,32 @@ SpringMVC中，可以直接将表单中的数据封账到java对象中，免去�
         //获取属性值
         classWrapper.getPropertyValue("name");
     }
+    
+Expression|Explanation
+:-|:-
+name	| 表示属性 name与getName()或isName()和setName(..)方法相对应
+account.name	| 表示 account 属性的嵌套属性name与getAccount().setName() 或 getAccount().getName() 相对应.
+account[2]	| 表示索引属性account的第_3_个属性. 索引属性可以是array, list, 其他自然排序的集合.
+account[COMPANYNAME]	| 表示映射属性account被键COMPANYNAME 索引的映射项的值。
+
+官方的示例：
+
+     BeanWrapper company = new BeanWrapperImpl(new Company());
+     // setting the company name..
+     company.setPropertyValue("name", "Some Company Inc.");
+     // ... can also be done like this:
+     PropertyValue value = new PropertyValue("name", "Some Company Inc.");
+     company.setPropertyValue(value);
+     
+     // ok, let's create the director and tie it to the company:
+     BeanWrapper jim = new BeanWrapperImpl(new Employee());
+     jim.setPropertyValue("name", "Jim Stravinsky");
+     
+     //设置属性为引用类型
+     company.setPropertyValue("managingDirector", jim.getWrappedInstance());
+     
+     // retrieving the salary of the managingDirector through the company
+     Float salary = (Float) company.getPropertyValue("managingDirector.salary");
+        
+        
+    
