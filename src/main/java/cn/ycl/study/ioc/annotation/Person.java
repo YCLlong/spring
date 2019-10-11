@@ -1,4 +1,4 @@
-package cn.ycl.study.annotation;
+package cn.ycl.study.ioc.annotation;
 
 public class Person {
     private String name;
