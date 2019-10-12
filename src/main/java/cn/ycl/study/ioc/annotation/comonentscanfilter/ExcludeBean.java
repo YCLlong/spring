@@ -1,4 +1,4 @@
-package cn.ycl.study.annotation.comonentscanfilter;
+package cn.ycl.study.ioc.annotation.comonentscanfilter;
 
 import org.springframework.stereotype.Component;
 

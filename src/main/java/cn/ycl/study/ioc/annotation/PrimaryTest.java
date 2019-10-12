@@ -7,12 +7,12 @@ public class PrimaryTest {
     @Autowired
     //指定person2装配
     @Qualifier("person2")
-    public cn.ycl.study.annotation.Person person;
+    public Person person;
 
-    private cn.ycl.study.annotation.Person privatePerson;
+    private Person privatePerson;
 
     @Autowired
-    private void init(@Qualifier("person1") cn.ycl.study.annotation.Person person){
+    private void init(@Qualifier("person1") Person person){
         this.privatePerson = privatePerson;
     }
 }

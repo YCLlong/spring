@@ -13,13 +13,13 @@ public class BeanConfig {
     }
 
     @Bean
-    public cn.ycl.study.annotation.Person person1(){
-        return new cn.ycl.study.annotation.Person("龙哥",24);
+    public Person person1(){
+        return new Person("龙哥",24);
     }
 
     @Bean
-    public cn.ycl.study.annotation.Person person2(){
-        return new cn.ycl.study.annotation.Person("焦妹",24);
+    public Person person2(){
+        return new Person("焦妹",24);
     }
 
     @Bean

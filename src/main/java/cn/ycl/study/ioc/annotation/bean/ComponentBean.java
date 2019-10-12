@@ -1,6 +1,6 @@
-package cn.ycl.study.annotation.bean;
+package cn.ycl.study.ioc.annotation.bean;
 
-import cn.ycl.study.annotation.Person;
+import cn.ycl.study.ioc.annotation.Person;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
