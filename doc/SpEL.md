@@ -38,3 +38,80 @@ Spring表达式使用非常简单，大致分3
         System.out.println( expression.getValueType()); //class java.lang.String
         System.out.println(expression.getValue());// hello world
     }
+
+## 字面值
+Spring的表达式可以将文字解析成值
+
+    ExpressionParser parser = new SpelExpressionParser();
+    // evals to "Hello World"
+    String helloWorld = (String) parser.parseExpression("'Hello World'").getValue();
+    double avogadrosNumber = (Double) parser.parseExpression("6.0221415E+23").getValue();
+    // evals to 2147483647
+    int maxValue = (Integer) parser.parseExpression("0x7FFFFFFF").getValue();
+    boolean trueValue = (Boolean) parser.parseExpression("true").getValue();
+    Object nullValue = parser.parseExpression("null").getValue();
+    
+## 属性
+当我们想使用一个对象的属性的值时，表达式中可以直接使用 点号应用属性
+    
+    int year = (Integer) parser.parseExpression("Birthdate.Year + 1900").getValue(context);
+    String city = (String) parser.parseExpression("placeOfBirth.City").getValue(context);
+    
+## 数组和List
+数组和集合可以直接使用 方括号引用元素 [] 
+
+    ExpressionParser parser = new SpelExpressionParser();
+    
+    // Inventions Array
+    StandardEvaluationContext teslaContext = new StandardEvaluationContext(tesla);
+    
+    // evaluates to "Induction motor"
+    String invention = parser.parseExpression("inventions[3]").getValue(
+            teslaContext, String.class);
+    
+    // Members List
+    StandardEvaluationContext societyContext = new StandardEvaluationContext(ieee);
+    
+    // evaluates to "Nikola Tesla"
+    String name = parser.parseExpression("Members[0].Name").getValue(
+            societyContext, String.class);
+    
+    // List and Array navigation
+    // evaluates to "Wireless communication"
+    String invention = parser.parseExpression("Members[0].Inventions[6]").getValue(
+            societyContext, String.class);
+            
+数组类似于 java语法，可以赋初始值
+    
+    int[] numbers1 = (int[]) parser.parseExpression("new int[4]").getValue(context);
+    
+    // Array with initializer
+    int[] numbers2 = (int[]) parser.parseExpression("new int[]{1,2,3}").getValue(context);
+    
+    // Multi dimensional array
+    int[][] numbers3 = (int[][]) parser.parseExpression("new int[4][5]").getValue(context);
+            
+## map
+通过Map的key找到value。可以获取值也可以设置值
+
+    Inventor pupin = parser.parseExpression("Officers['president']").getValue(
+            societyContext, Inventor.class);
+    
+    // evaluates to "Idvor"
+    String city = parser.parseExpression("Officers['president'].PlaceOfBirth.City").getValue(
+            societyContext, String.class);
+    
+    // setting values
+    parser.parseExpression("Officers['advisors'][0].PlaceOfBirth.Country").setValue(
+            societyContext, "Croatia");
+
+## 内联集合
+在表达式内部定义的集合就是内联集合，内联集合写法和json机会一样
+    
+    List numbers = (List) parser.parseExpression("{1,2,3,4}").getValue(context);
+    List listOfLists = (List) parser.parseExpression("{{'a','b'},{'x','y'}}").getValue(context);、、、
+    Map inventorInfo = (Map) parser.parseExpression("{name:'Nikola',dob:'10-July-1856'}").getValue(context);
+    Map mapOfMaps = (Map) parser.parseExpression("{name:{first:'Nikola',last:'Tesla'},dob:{day:10,month:'July',year:1856}}").getValue(context);
+    
+## 方法
+表达式执行方法和java执行方法一样的
