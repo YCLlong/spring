@@ -47,10 +47,20 @@ Spring 默认使用JDK的动态代理作为AOP的代理，这样任何接口（�
 Spring也支持使用CGLIB代理，对于需要代理类而不是接口的时候，CGLIB代理非常有必要的，如果业务对象并没有实现接口，默认会使用CGLIB代理。当然并不是说实现了接口就不能使用CGLIB代理，可以强制使用CGLIB代理。
 
 ## @AspectJ的支持
-要在Spring中使用@AjpectJ切面，需要Spring启动AjpectJ支持。
+要在Spring中使用@AjpectJ切面，需要Spring启动AspectJ支持。
+
+可以使用XML或Java配置的方式启用@AspectJ支持。不管哪一种方式，您还需要确保AspectJ的aspectjweaver.jar库位于应用程序的类路径中（版本1.8或更高版本）。此库可在AspectJ分发的lib 目录中或Maven Central存储库中找到。
+    
+    <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjweaver</artifactId>
+        <version>1.9.4</version>
+    </dependency>
+
 XML配置的方式启动
-
-
+    
+    <!--开启aspectJ的注解开发，AspectJ的自动代理-->
+    <!--<aop:aspectj-autoproxy/>-->
 
 注解的方式启动
 
@@ -60,5 +70,6 @@ XML配置的方式启动
     
     }
 
+## Spring 自动检测AOP
 
 
