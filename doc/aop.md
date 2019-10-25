@@ -17,7 +17,7 @@ spring aop通知(advice)分成五类：
 正常返回通知[After returning advice]：在连接点正常执行完成后执行，如果连接点抛出异常，则不会执行。 
 异常返回通知[After throwing advice]：在连接点抛出异常后执行。 
 返回通知[After (finally) advice]：在连接点执行完成后执行，不管是正常执行完成，还是抛出异常，都会执行返回通知中的内容。 
-环绕通知[Around advice]：环绕通知围绕在连接点前后，比如一个方法调用的前后。这是最
+环绕通知[Around advice]：环绕通知围绕在连接点前后，比如一个方法调用的前后。
 
 ### 连接点（JoinPoint）
 允许使用通知的地方叫做连接点，哪些地方允许使用通知呢（增强功能）？比如方法的前，后（前后都有），或则抛出异常都是连接点。在Spring AOP中，一个连接点总是表示一个方法的执行。
@@ -69,7 +69,83 @@ XML配置的方式启动
     public class AppConfig {
     
     }
+    
+## 注解的方式实现AOP
+要增强的目标类：
 
-## Spring 自动检测AOP
+    @Component
+    public class TestAopTarget {
+        //现有的类的方法，需要增强这个方法，但是不修改这个源码
+        public void sayHello(){
+            System.out.println("hello world");
+        }
+    }
+
+增强后的类：
+    
+    @Aspect
+    @Component
+    public class AopBean {
+        private long t;
+    
+        @Pointcut("execution(public void cn.ycl.study.aop.bean.TestAopTarget.sayHello())")
+        public void say(){
+        }
+    
+        @Before("say()")
+        public void before(){
+            t = System.currentTimeMillis();
+            System.out.println("before:" + t);
+        }
+    
+        @After("say()")
+        public void after(){
+            Long end = System.currentTimeMillis();
+            t = end - t;
+            System.out.println("after,end =" + end + "间隔：" + t);
+        }
+    }
+    
+调用客户端：
+    
+    public static void main(String[] args) {
+        ApplicationContext context = getAnnotationContext();
+        TestAopTarget target = context.getBean(TestAopTarget.class);
+        target.sayHello();
+    }
+    
+### 不同通知类型之间的变量传递
+spring aop可以让我们在要增强的消息前加方法增强，也能在要增强的目标方法之后增强，比如性能检测组件，执行前记录当前时间，方法执行后当前时间减去执行前的时间就是方法调用时间。
+那么涉及到两个方法之间变量的处理。
+我们可以将这个变量作为**增强类的成员变量**，那么这个变量在通知的方法中就是共享的。
+
+### 使用总结
+1,启动AspectJ支持后
+2,编写增强类，增强类加上@AspectJ注解
+3，增强类的方法中配置切面 @Pointcut 注解
+4，配置通知类型，@Before ，@After， @Around 等，增强切面
+5，调用增强的目标方法，会直接执行增强后代理的对象，及增强功能的对象
+
+## XML配置的方式实现AOP
 
 
+## 相关注解
+由下列方式来定义或者通过 &&、 ||、 !、 的方式进行组合：
+
+execution：用于匹配方法执行的连接点；
+
+within：用于匹配指定类型内的方法执行；
+
+this：用于匹配当前AOP代理对象类型的执行方法；注意是AOP代理对象的类型匹配，这样就可能包括引入接口也类型匹配；        
+
+target：用于匹配当前目标对象类型的执行方法；注意是目标对象的类型匹配，这样就不包括引入接口也类型匹配；
+
+args：用于匹配当前执行的方法传入的参数为指定类型的执行方法；
+
+@within：用于匹配所以持有指定注解类型内的方法；
+
+@target：用于匹配当前目标对象类型的执行方法，其中目标对象持有指定的注解；
+
+@args：用于匹配当前执行的方法传入的参数持有指定注解的执行；
+
+@annotation：用于匹配当前执行方法持有指定注解的方法；
