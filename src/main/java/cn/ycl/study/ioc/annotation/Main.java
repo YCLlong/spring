@@ -10,7 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
-    public void testAnnotation( ApplicationContext getContext ){
+    public void testAnnotation(ApplicationContext getContext) {
         XmlToAnnotationBean bean = getContext.getBean(XmlToAnnotationBean.class);
         bean.show();
     }
@@ -18,39 +18,39 @@ public class Main {
     /**
      * 测试自动注入
      */
-    public void autowried(){
+    public void autowried() {
         System.out.println("开始执行");
         ApplicationContext context = getContext();
         AutowiredBean bean = context.getBean(AutowiredBean.class);
         bean.normalMethod(null);
     }
 
-    public void primaryTest(){
+    public void primaryTest() {
         ApplicationContext context = getContext();
         PrimaryTest bean = context.getBean(PrimaryTest.class);
         System.out.println(bean.person.getName());
     }
 
-    public void selfQulifier(){
+    public void selfQulifier() {
         ApplicationContext context = getContext();
         //如果没有这句，不会触发自动装配
         Object bean = context.getBean(QulifierTest.class);
         System.out.println("11");
     }
 
-    public void other(){
+    public void other() {
         ApplicationContext context = getContext();
         Object bean = context.getBean(ResourceTest.class);
         System.out.println("11");
     }
 
-    public void componentScanTest(){
+    public void componentScanTest() {
         ApplicationContext context = getAnnotationContext();
         context.getBean(ExcludeBean.class);
         System.out.println("结束");
     }
 
-    public void testBean(){
+    public void testBean() {
         ApplicationContext context = getContext();
 
         //测试Component和Configuration中注册bean的区别
@@ -81,14 +81,14 @@ public class Main {
 
     }
 
-    public static ApplicationContext getContext(){
+    public static ApplicationContext getContext() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring-annotation.xml");
         //注册回调钩子，可以保证程序关闭时，能够回调bean的destory方法，从而释放资源
         context.registerShutdownHook();
         return context;
     }
 
-    public static AnnotationConfigApplicationContext getAnnotationContext(){
+    public static AnnotationConfigApplicationContext getAnnotationContext() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ConfigApp.class);
         return context;
     }

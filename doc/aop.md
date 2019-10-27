@@ -69,6 +69,124 @@ XML配置的方式启动
     public class AppConfig {
     
     }
+
+## 切点表达式
+Spring Aop 支持使用以下AspectJ切点标识符（PCD），用于切点表达式。
+由下列方式来定义或者通过 &&、 ||、 !、 的方式进行组合，例如：
+    
+    @Pointcut("execution(public * *(..))")
+    private void anyPublicOperation() {} (1)
+    
+    @Pointcut("within(com.xyz.someapp.trading..*)")
+    private void inTrading() {} (2)
+    
+    @Pointcut("anyPublicOperation() && inTrading()")
+    private void tradingOperation() {} (3)
+    
+    （3） 使用 && 组合了 (1) 和 (2) 这两个切点表达式，注意写法，写的是方法名
+    
+
+execution：用于匹配方法执行的连接点，这是使用Spring AOP时主要的切点标识符；
+
+within：用于匹配指定类型内的方法执行；
+
+this：用于匹配当前AOP代理对象类型的执行方法；注意是AOP代理对象的类型匹配，这样就可能包括引入接口也类型匹配；        
+
+target：用于匹配当前目标对象类型的执行方法；注意是目标对象的类型匹配，这样就不包括引入接口也类型匹配；
+
+args：用于匹配当前执行的方法传入的参数为指定类型的执行方法；
+
+@within：用于匹配所以持有指定注解类型内的方法；
+
+@target：用于匹配当前目标对象类型的执行方法，其中目标对象持有指定的注解；
+
+@args：用于匹配当前执行的方法传入的参数持有指定注解的执行；
+
+@annotation：用于匹配当前执行方法持有指定注解的方法；
+
+
+示例：
+    
+    匹配任意公共方法的执行:
+    
+    execution(public * *(..))
+    匹配任意以set开始的方法:
+    
+    execution(* set*(..))
+    匹配定义了AccountService接口的任意方法:
+    
+    execution(* com.xyz.service.AccountService.*(..))
+    匹配定义在service 包中的任意方法:
+    
+    execution(* com.xyz.service.*.*(..))
+    匹配定义在service包和其子包中的任意方法:
+    
+    execution(* com.xyz.service..*.*(..))
+    匹配在service包中的任意连接点（只在Spring AOP中的方法执行）:
+    
+    within(com.xyz.service.*)
+    匹配在service包及其子包中的任意连接点（只在Spring AOP中的方法执行）:
+    
+    within(com.xyz.service..*)
+    匹配代理实现了AccountService 接口的任意连接点（只在Spring AOP中的方法执行）：
+    
+    this(com.xyz.service.AccountService)
+    'this' 常常以捆绑的形式出现. 见后续的章节讨论如何在声明通知中使用代理对象。
+    
+    匹配当目标对象实现了AccountService接口的任意连接点（只在Spring AOP中的方法执行）:
+    
+    target(com.xyz.service.AccountService)
+    'target' 常常以捆绑的形式出现. 见后续的章节讨论如何在声明通知中使用目标对象。
+    
+    匹配使用了单一的参数，并且参数在运行时被传递时可以序列化的任意连接点（只在Spring的AOP中的方法执行）。:
+    
+    args(java.io.Serializable)
+    'args' 常常以捆绑的形式出现.见后续的章节讨论如何在声明通知中使用方法参数。
+    
+    注意在这个例子中给定的切点不同于execution(* *(java.io.Serializable)). 如果在运行时传递的参数是可序列化的，则与execution匹配，如果方法签名声明单个参数类型可序列化，则与args匹配。
+    
+    匹配当目标对象有@Transactional注解时的任意连接点（只在Spring AOP中的方法执行）。
+    
+    @target(org.springframework.transaction.annotation.Transactional)
+    '@target' 也可以以捆绑的形式使用.见后续的章节讨论如何在声明通知中使用注解对象。
+    
+    匹配当目标对象的定义类型有@Transactional注解时的任意连接点（只在Spring的AOP中的方法执行）:
+    
+    @within(org.springframework.transaction.annotation.Transactional)
+    '@within' 也可以以捆绑的形式使用.见后续的章节讨论如何在声明通知中使用注解对象。
+    
+    匹配当执行的方法有@Transactional注解的任意连接点（只在Spring AOP中的方法执行）:
+    
+    @annotation(org.springframework.transaction.annotation.Transactional)
+    '@annotation' 也可以以捆绑的形式使用.见后续的章节讨论如何在声明通知中使用注解对象。
+    
+    匹配有单一的参数并且在运行时传入的参数类型有@Classified注解的任意连接点（只在Spring AOP中的方法执行）:
+    
+    @args(com.xyz.security.Classified)
+    '@args' 也可以以捆绑的形式使用.见后续的章节讨论如何在声明通知中使用注解对象。
+    
+    匹配在名为tradeService的Spring bean上的任意连接点（只在Spring AOP中的方法执行）:
+    
+    bean(tradeService)
+    匹配以Service结尾的Spring bean上的任意连接点（只在Spring AOP中方法执行） :
+    
+    bean(*Service)
+
+# AOP代理
+
+Spring**默认**使用jdk动态代理作为AOP代理。这样任何接口（或者接口的Set）都可以被代理。
+
+Spring也支持使用CGLIB代理，对于需要代理类而不是接口的时候CGLIB代理是很有必要的，如果业务对象没有接口实现，默认就会使用CGLIB代理，此外，面向接口编程实践，业务对象通常会实现一个或多个接口，当然还能强制使用CGLIB代理。
+
+## 强制使用CGLIB代理
+
+若要强制使用过CGLIB代理，将
+### xml配置：
+    <aop:config proxy-target-class = "true">
+
+### java配置：
+    @EnableAspectJAutoProxy(proxyTargetClass = true)
+
     
 ## 注解的方式实现AOP
 要增强的目标类：
@@ -128,24 +246,3 @@ spring aop可以让我们在要增强的消息前加方法增强，也能在要�
 
 ## XML配置的方式实现AOP
 
-
-## 相关注解
-由下列方式来定义或者通过 &&、 ||、 !、 的方式进行组合：
-
-execution：用于匹配方法执行的连接点；
-
-within：用于匹配指定类型内的方法执行；
-
-this：用于匹配当前AOP代理对象类型的执行方法；注意是AOP代理对象的类型匹配，这样就可能包括引入接口也类型匹配；        
-
-target：用于匹配当前目标对象类型的执行方法；注意是目标对象的类型匹配，这样就不包括引入接口也类型匹配；
-
-args：用于匹配当前执行的方法传入的参数为指定类型的执行方法；
-
-@within：用于匹配所以持有指定注解类型内的方法；
-
-@target：用于匹配当前目标对象类型的执行方法，其中目标对象持有指定的注解；
-
-@args：用于匹配当前执行的方法传入的参数持有指定注解的执行；
-
-@annotation：用于匹配当前执行方法持有指定注解的方法；

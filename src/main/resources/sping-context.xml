@@ -11,7 +11,7 @@
 
     <alias name="h1" alias="h2"></alias>
     <alias name="h1" alias="h3"></alias>
-    <bean id="helloIOC" name="h1,h11"  class="cn.ycl.study.ioc.xml.HelloIOC">
+    <bean id="helloIOC" name="h1,h11" class="cn.ycl.study.ioc.xml.HelloIOC">
         <constructor-arg name="desc" value="123构造函数注入"></constructor-arg>
     </bean>
 
@@ -149,7 +149,7 @@
     </bean>
 
     <!--自动装配-->
-    <bean id="vlueConfig"  class="cn.ycl.study.ioc.xml.HelloIOC">
+    <bean id="vlueConfig" class="cn.ycl.study.ioc.xml.HelloIOC">
         <constructor-arg name="desc" value="自动装配"></constructor-arg>
     </bean>
     <bean name="config9" autowire="no" class="cn.ycl.study.ioc.xml.bean.AutowireConfig"/>
@@ -165,14 +165,15 @@
     <bean name="replaceBeanB" class="cn.ycl.study.ioc.xml.methoddi.BeanB">
         <property name="desc" value="replace-method测试，没有替换之前的初始值"/>
         <!--替换BeanB中的 getDesc 方法，使用替换对象 replaceBeanA-->
-        <replaced-method  name="getDesc" replacer="replaceBeanA"/>
+        <replaced-method name="getDesc" replacer="replaceBeanA"/>
     </bean>
 
     <!--生命周期-->
     <bean name="config10" class="cn.ycl.study.ioc.xml.bean.Config" scope="prototype"/>
 
     <!--bean的扩展点-->
-    <bean name="expondLifeInterface" class="cn.ycl.study.ioc.xml.expond.TestLifeInterfaceBean" init-method="afterPropertiesSet" destroy-method="destroy"/>
+    <bean name="expondLifeInterface" class="cn.ycl.study.ioc.xml.expond.TestLifeInterfaceBean"
+          init-method="afterPropertiesSet" destroy-method="destroy"/>
 
     <!--默认的初始化和销毁方法回调-->
     <bean name="life" class="cn.ycl.study.ioc.xml.bean.BeanLife"/>

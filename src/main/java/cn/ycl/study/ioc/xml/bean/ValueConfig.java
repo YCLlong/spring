@@ -8,15 +8,16 @@ import java.util.Set;
 public class ValueConfig {
     private List<String> stringList;
     private List<Config> configList;
-    private Map<String,String> stringMap;
-    private Map<String,Config> configMap;
+    private Map<String, String> stringMap;
+    private Map<String, Config> configMap;
     private Set<String> stringSet;
     private Set<Config> configSet;
     private String[] strArray;
     private Config[] configArray;
     private Properties prop;
 
-    public ValueConfig(){}
+    public ValueConfig() {
+    }
 
     public List<String> getStringList() {
         return stringList;

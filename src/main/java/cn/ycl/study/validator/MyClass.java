@@ -8,7 +8,7 @@ public class MyClass {
     private Integer no;
     private List<Person> studentList;
     private Person teacher;
-    private Map<String,Person> committee;
+    private Map<String, Person> committee;
 
     public String getName() {
         return name;

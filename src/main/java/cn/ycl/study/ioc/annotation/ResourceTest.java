@@ -11,7 +11,7 @@ public class ResourceTest {
     private String desc;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         desc = "123";
     }
 

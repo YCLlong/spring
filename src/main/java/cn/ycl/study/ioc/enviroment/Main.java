@@ -22,9 +22,10 @@ public class Main {
 
     /**
      * 通过java配置创建ioc容器实例
+     *
      * @return
      */
-    public static AnnotationConfigApplicationContext getAnnotationContext(){
+    public static AnnotationConfigApplicationContext getAnnotationContext() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
         return context;
     }

@@ -1,6 +1,6 @@
 package cn.ycl.study.ioc.xml.expond;
 
-public class TestLifeInterfaceBean{
+public class TestLifeInterfaceBean {
     private String desc;
 
     public void afterPropertiesSet() throws Exception {

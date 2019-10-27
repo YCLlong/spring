@@ -12,7 +12,7 @@ public class PrimaryTest {
     private Person privatePerson;
 
     @Autowired
-    private void init(@Qualifier("person1") Person person){
+    private void init(@Qualifier("person1") Person person) {
         this.privatePerson = privatePerson;
     }
 }

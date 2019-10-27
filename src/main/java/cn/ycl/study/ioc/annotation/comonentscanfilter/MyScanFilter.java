@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class MyScanFilter implements TypeFilter {
     public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
-        if (metadataReader.getClassMetadata().getClassName().contains("ExcludeBean")){
+        if (metadataReader.getClassMetadata().getClassName().contains("ExcludeBean")) {
             //获取当前类注解的信息
             AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
             for (String s : annotationMetadata.getAnnotationTypes()) {

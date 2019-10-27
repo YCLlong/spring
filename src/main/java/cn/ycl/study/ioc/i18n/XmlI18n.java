@@ -8,13 +8,13 @@ import java.util.Locale;
 public class XmlI18n {
     public static void main(String[] args) {
         MessageSource messageSource = getMessageSource();
-        String msgUs = messageSource.getMessage("tip",new Object[]{"name","code"}, Locale.US);
+        String msgUs = messageSource.getMessage("tip", new Object[]{"name", "code"}, Locale.US);
         System.out.println(msgUs);
-        String msgChina = messageSource.getMessage("tip",new Object[]{"姓名","编号"}, Locale.CHINA);
+        String msgChina = messageSource.getMessage("tip", new Object[]{"姓名", "编号"}, Locale.CHINA);
         System.out.println(msgChina);
     }
 
-    public static MessageSource getMessageSource(){
+    public static MessageSource getMessageSource() {
         MessageSource source = new ClassPathXmlApplicationContext("classpath:sping-context.xml");
         return source;
     }

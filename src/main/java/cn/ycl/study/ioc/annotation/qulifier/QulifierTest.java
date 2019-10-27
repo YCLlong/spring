@@ -10,13 +10,13 @@ public class QulifierTest {
     @Autowired
     //使用自定义限定符注解，会从配置元数据中读取限定符信息。如果读取到多个相同类型具有相同的限定符信息时也会报错
     @Offline(name = "test")
-    private void test(SelfQulifier qulifier){
+    private void test(SelfQulifier qulifier) {
         this.qulifier = qulifier;
     }
 
     @Autowired
-    @Offline(name = "test",level = 1)
-    private void test1(SelfQulifier qulifier){
+    @Offline(name = "test", level = 1)
+    private void test1(SelfQulifier qulifier) {
         this.qulifier = qulifier;
     }
 }

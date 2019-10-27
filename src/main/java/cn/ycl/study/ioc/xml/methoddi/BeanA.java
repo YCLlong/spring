@@ -1,6 +1,6 @@
 package cn.ycl.study.ioc.xml.methoddi;
 
-public abstract class BeanA{
+public abstract class BeanA {
     private String desc;
 
     //定义为抽象方法

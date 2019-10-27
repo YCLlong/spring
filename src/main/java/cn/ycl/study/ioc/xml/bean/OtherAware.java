@@ -13,7 +13,7 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.jmx.export.notification.NotificationPublisher;
 import org.springframework.jmx.export.notification.NotificationPublisherAware;
 
-public class OtherAware implements  NotificationPublisherAware , LoadTimeWeaverAware, ApplicationEventPublisherAware, BeanClassLoaderAware, BeanFactoryAware, BeanNameAware, ResourceLoaderAware, MessageSourceAware {
+public class OtherAware implements NotificationPublisherAware, LoadTimeWeaverAware, ApplicationEventPublisherAware, BeanClassLoaderAware, BeanFactoryAware, BeanNameAware, ResourceLoaderAware, MessageSourceAware {
 
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 
